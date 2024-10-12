@@ -1,11 +1,11 @@
 <template>
-  <div class="navbar bg-base-100">
+  <div class="navbar bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg">
     <div class="navbar-start">
       <div class="dropdown">
         <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
+            class="h-6 w-6"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -20,43 +20,39 @@
         </div>
         <ul
           tabindex="0"
-          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+          class="menu menu-sm dropdown-content bg-white text-gray-700 rounded-lg z-10 mt-3 w-52 p-2 shadow-lg"
         >
           <li>
-            <router-link to="/" active-class="active-link"> Inicio </router-link>
+            <router-link to="/" active-class="active-link">Inicio</router-link>
           </li>
           <li>
             <details open>
               <summary>Carreras</summary>
-              <ul>
+              <ul class="pl-4">
                 <li>
-                  <router-link to="/agri" active-class="active-link"> Agricultura </router-link>
+                  <router-link to="/agri" active-class="active-link">Agricultura</router-link>
                 </li>
                 <li>
-                  <router-link to="/juri" active-class="active-link"
-                    >Lic. en ciencias juridicas</router-link
-                  >
+                  <router-link to="/juri" active-class="active-link">Lic. en ciencias jurídicas</router-link>
                 </li>
                 <li>
-                  <router-link to="/social" active-class="active-link"
-                    >Lic. trabajo social</router-link
-                  >
+                  <router-link to="/social" active-class="active-link">Lic. trabajo social</router-link>
                 </li>
               </ul>
             </details>
           </li>
-          <li><a>Item 3</a></li>
+          <li><a href="#">Item 3</a></li>
         </ul>
       </div>
     </div>
     <div class="navbar-center">
-      <a class="btn btn-ghost text-xl">daisyUI</a>
+      <a class="text-2xl font-bold">ULS Eventos</a> 
     </div>
-    <div class="navbar-end">
+    <div class="navbar-end flex items-center space-x-3">
       <button class="btn btn-ghost btn-circle">
         <svg
           xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
+          class="h-6 w-6"
           fill="none"
           viewBox="0 0 24 24"
           stroke="currentColor"
@@ -73,7 +69,7 @@
         <div class="indicator">
           <svg
             xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
+            class="h-6 w-6"
             fill="none"
             viewBox="0 0 24 24"
             stroke="currentColor"
@@ -91,3 +87,26 @@
     </div>
   </div>
 </template>
+
+<style scoped>
+.navbar {
+  padding: 1rem;
+}
+
+.dropdown-content {
+  transition: all 0.3s ease-in-out; 
+}
+
+.dropdown:hover .dropdown-content {
+  transform: scale(1.05); 
+}
+
+.active-link {
+  color: #1d4ed8;
+  font-weight: bold;
+}
+
+.btn-circle:hover {
+  background-color: rgba(255, 255, 255, 0.1); 
+}
+</style>
