@@ -42,11 +42,18 @@
                     >Lic. trabajo social</router-link
                   >
                 </li>
+                <li>
+                  <router-link to="/ContactoPagina" active-class="active-link"
+                    >Contactanos</router-link
+                  >
+                </li>
               </ul>
             </details>
           </li>
-          <li><a>Item 3</a></li>
-        </ul>
+              <li>
+                  <router-link to="/calendario" active-class="active-link">Calendario de Eventos</router-link>
+                </li>
+              </ul>
       </div>
     </div>
     <div class="navbar-center">

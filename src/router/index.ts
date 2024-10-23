@@ -34,6 +34,19 @@ const router = createRouter({
       component: () => import('@/modules/pages/trabajos.vue'),
       meta: { requiresAuth: true },
     },
+
+    {
+      path: '/calendario',
+      name: 'calendario',
+      component: () => import('@/modules/pages/calendario.vue'),
+      meta: { requiresAuth: true },
+    },
+    {
+      path: '/ContactoPagina',
+      name: 'ContactoPagina',
+      component: () => import('@/modules/pages/ContactoPagina.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 
