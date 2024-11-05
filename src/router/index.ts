@@ -25,6 +25,11 @@ const router = createRouter({
       name: 'trabajo_social',
       component: () => import('@/modules/pages/trabajos.vue'),
     },
+    {
+      path: '/login', // Nueva ruta añadida
+      name: 'login',
+      component: () => import('@/modules/pages/Login-page.vue'), // Asegúrate que esta ruta es correcta
+    },
   ],
 });
 
