@@ -1,41 +1,22 @@
 <template>
-  <TopMenu />
+  <!-- Renderiza el Navbar solo si no estás en la página de inicio de sesión -->
+  <Navbar v-if="!isLoginPage" /> 
 
-  <!-- Si el usuario está autenticado, muestra el contenido -->
-  <div v-if="user">
-    <RouterView />
-  </div>
-
-  <!-- Si el usuario no está autenticado, redirige o muestra un mensaje -->
-  <div v-else>
-    <p class="text-center mt-8 text-gray-500">No estás autenticado. Por favor inicia sesión.</p>
-  </div>
+  <!-- Main -->
+  <main class="flex-1 overflow-auto">
+    <router-view />
+  </main>
 </template>
 
 <script setup lang="ts">
-import './style.css';
-import TopMenu from './modules/common/components/TopMenu.vue';
-import { ref, onMounted } from 'vue';
-import { onAuthStateChanged } from 'firebase/auth';
-import { auth } from './firebase';
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
+import Navbar from './modules/common/components/TopMenu.vue';
 
-// Estado reactivo para almacenar el usuario
-const user = ref(null);
-
-// Detecta cambios en el estado de autenticación de Firebase
-onMounted(() => {
-  onAuthStateChanged(auth, (currentUser) => {
-    if (currentUser) {
-      user.value = currentUser;
-      console.log('Usuario autenticado:', currentUser);
-    } else {
-      user.value = null;
-      console.log('No estás autenticado');
-    }
-  });
-});
+const route = useRoute();
+const isLoginPage = computed(() => route.name === 'paginaprincipal'); // Asegúrate de que coincida con el nombre de la ruta
 </script>
 
 <style scoped>
-/* Puedes agregar estilos si es necesario */
+/* Estilos generales */
 </style>
