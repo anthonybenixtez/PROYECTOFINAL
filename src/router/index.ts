@@ -34,6 +34,12 @@ const router = createRouter({
       component: () => import('@/modules/pages/trabajos.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/forciencias',
+      name: 'form_ciencias',
+      component: () => import('@/modules/pages/forciencias.vue'),
+      meta: { requiresAuth: true },
+    },
   ],
 });
 
