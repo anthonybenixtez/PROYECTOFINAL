@@ -1,100 +1,115 @@
 <template>
-  <div class="navbar bg-base-100">
+  <div class="navbar bg-blue-600 text-white shadow-md">
+    <!-- Navbar Start -->
     <div class="navbar-start">
+      <!-- Dropdown Menu for mobile -->
       <div class="dropdown">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 6h16M4 12h16M4 18h7"
-            />
-          </svg>
-        </div>
-        <ul
+        <button
           tabindex="0"
-          class="menu menu-sm dropdown-content bg-base-100 rounded-box z-[1] mt-3 w-52 p-2 shadow"
+          class="btn btn-ghost btn-circle text-white"
+          @click="toggleMenu"
+        >
+          <i class="fas fa-bars h-6 w-6"></i>
+        </button>
+        <ul
+          v-show="isMenuOpen"
+          tabindex="0"
+          class="menu menu-sm dropdown-content bg-base-100 rounded-box shadow-lg mt-3 w-52 p-3 z-50"
         >
           <li>
-            <router-link to="/" active-class="active-link"> Inicio </router-link>
+            <router-link to="/home" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+              <i class="fas fa-home h-6 w-6 mr-2"></i>
+              Inicio
+            </router-link>
           </li>
           <li>
-            <details open>
-              <summary>Carreras</summary>
+            <details open class="group">
+              <summary class="group-hover:text-blue-500 text-gray-800 flex items-center">
+                <i class="fas fa-graduation-cap h-6 w-6 mr-2"></i>
+                Carreras
+              </summary>
               <ul>
                 <li>
-                  <router-link to="/agri" active-class="active-link"> Agricultura </router-link>
+                  <router-link to="/agri" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+                    <i class="fas fa-leaf h-6 w-6 mr-2"></i>
+                    Agricultura
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/juri" active-class="active-link"
-                    >Lic. en ciencias juridicas</router-link
-                  >
+                  <router-link to="/juri" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+                    <i class="fas fa-gavel h-6 w-6 mr-2"></i>
+                    Lic. en Ciencias Jurídicas
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/social" active-class="active-link"
-                    >Lic. trabajo social</router-link
-                  >
+                  <router-link to="/social" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+                    <i class="fas fa-users h-6 w-6 mr-2"></i>
+                    Lic. en Trabajo Social
+                  </router-link>
                 </li>
                 <li>
-                  <router-link to="/ContactoPagina" active-class="active-link"
-                    >Contactanos</router-link
-                  >
+                  <router-link to="/ContactoPagina" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+                    <i class="fas fa-envelope h-6 w-6 mr-2"></i>
+                    Contáctanos
+                  </router-link>
                 </li>
               </ul>
             </details>
           </li>
-              <li>
-                  <router-link to="/calendario" active-class="active-link">Calendario de Eventos</router-link>
-                </li>
-              </ul>
+          <li>
+            <router-link to="/calendario" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+              <i class="fas fa-calendar-alt h-6 w-6 mr-2"></i>
+              Calendario de Eventos
+            </router-link>
+          </li>
+          <li>
+            <router-link to="/" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+              <i class="fas fa-sign-out-alt h-6 w-6 mr-2"></i>
+              Cerrar Sesión
+            </router-link>
+          </li>
+        </ul>
       </div>
     </div>
+
+    <!-- Navbar Center -->
     <div class="navbar-center">
-      <a class="btn btn-ghost text-xl">daisyUI</a>
+      <a class="btn btn-ghost text-xl font-semibold text-white">Eventos ULS</a>
     </div>
-    <div class="navbar-end">
-      <button class="btn btn-ghost btn-circle">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="h-5 w-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-          />
-        </svg>
+
+    <!-- Navbar End -->
+    <div class="navbar-end space-x-3">
+      <!-- Search Button -->
+      <button class="btn btn-ghost btn-circle text-white">
+        <i class="fas fa-search h-6 w-6"></i>
       </button>
-      <button class="btn btn-ghost btn-circle">
+
+      <!-- Notification Button -->
+      <button class="btn btn-ghost btn-circle text-white">
         <div class="indicator">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="h-5 w-5"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"
-            />
-          </svg>
+          <i class="fas fa-bell h-6 w-6"></i>
           <span class="badge badge-xs badge-primary indicator-item"></span>
         </div>
       </button>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+
+// Variable para controlar el estado del menú desplegable
+const isMenuOpen = ref(false);
+
+// Función para alternar la visibilidad del menú
+const toggleMenu = () => {
+  isMenuOpen.value = !isMenuOpen.value;
+};
+</script>
+
+<style scoped>
+/* Asegura que solo el menú desplegable se superponga */
+.dropdown-content {
+  z-index: 50; /* Establece un z-index alto para el menú desplegable */
+}
+</style>

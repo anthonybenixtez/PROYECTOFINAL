@@ -2,6 +2,9 @@ import { createRouter, createWebHistory } from 'vue-router';
 import Paginaprincipal from '@/modules/common/components/paginaprincipal.vue';
 import { auth } from '@/modules/common/components/firebase';
 
+// Estado global de carga para esperar la verificación de autenticación
+let isAuthChecked = false;
+
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
@@ -34,7 +37,6 @@ const router = createRouter({
       component: () => import('@/modules/pages/trabajos.vue'),
       meta: { requiresAuth: true },
     },
-
     {
       path: '/calendario',
       name: 'calendario',
@@ -56,16 +58,23 @@ const router = createRouter({
 });
 
 // Guard de navegación para proteger rutas
-router.beforeEach((to, from, next) => {
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth);
-  const loggedIn = !!auth.currentUser; // Verifica si el usuario está autenticado
+router.beforeEach(async (to, from, next) => {
+  // Si no se ha comprobado el estado de autenticación, esperamos que Firebase lo haga
+  if (!isAuthChecked) {
+    const user = await new Promise((resolve) => {
+      auth.onAuthStateChanged(resolve); // Espera a que Firebase confirme el estado de autenticación
+    });
 
-  // Si la ruta requiere autenticación y no hay un usuario autenticado, redirige a la página principal
-  if (requiresAuth && !loggedIn) {
-    next({ name: 'paginaprincipal' });
-  } else {
-    next(); // Permite el acceso
+    // Una vez comprobado, marca el estado como verificado
+    isAuthChecked = true;
+
+    // Si el usuario no está autenticado, redirige al login
+    if (to.matched.some(record => record.meta.requiresAuth) && !user) {
+      return next({ name: 'paginaprincipal' });
+    }
   }
+  // Permite la navegación si todo está listo
+  next();
 });
 
 export default router;

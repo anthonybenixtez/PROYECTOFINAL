@@ -1,40 +1,63 @@
 <template>
-  <div class="card bg-base-100 w-96 shadow-xl">
-    <figure>
-      <img
-        src="https://scontent.fsal1-1.fna.fbcdn.net/v/t39.30808-6/462243083_937603341742492_6245099774094448540_n.jpg?_nc_cat=111&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEvFzb_XVvxHrCTIGkxsb5s2yl1laFuTf3bKXWVoW5N_X9kCv5WkIhaMEDe_ofAqsR3dCN-7Qwvifdb8JjYAFFU&_nc_ohc=GgbmGOorxMUQ7kNvgERtzQj&_nc_ht=scontent.fsal1-1.fna&_nc_gid=AB3XS-laptjA_DoNWCseUVi&oh=00_AYCgnL78xTS4Rec4iYBsDI_Z92bV1wMiMPKdg-GfyI0tkQ&oe=670A450F"
-        alt="Shoes"
-      />
-    </figure>
-    <div class="card-body">
-      <h2 class="card-title">
-        Feria de Salud!
-        <div class="badge badge-secondary">Nuevo!!</div>
-      </h2>
-      <p>
-        Ven y descubre los beneficios proporcionados en nuestra Feria de salud te esperamos con
-        ansias
-      </p>
-      <div class="card-actions justify-end">
-        <div class="badge badge-outline">Trabajo Social</div>
+  <div class="flex justify-center items-center min-h-screen bg-gray-100">
+    <div class="card bg-base-200 w-96 shadow-xl rounded-2xl overflow-hidden">
+      <figure>
+        <img
+          class="w-full h-56 object-cover rounded-t-2xl"
+          src="https://www.elsoldelbajio.com.mx/local/hwbt9m-feria-de-la-salud-sma-1/ALTERNATES/LANDSCAPE_768/feria-de-la-salud-sma-1"
+          alt="Feria de Salud"
+        />
+      </figure>
+      <div class="card-body p-6">
+        <h2 class="card-title text-2xl font-semibold text-gray-800">
+          Feria de Salud!
+          <div class="badge badge-secondary">Nuevo!!</div>
+        </h2>
+        <p class="text-gray-700 mt-2 mb-4">
+          Ven y descubre los beneficios proporcionados en nuestra Feria de Salud, ¡te esperamos con ansias!
+        </p>
+        <div class="card-actions justify-between mt-4">
+          <div class="badge badge-outline text-lg text-gray-600">Trabajo Social</div>
+          <button
+            class="btn btn-primary"
+            @click="myModal = true"
+          >
+            Dirección
+          </button>
+        </div>
       </div>
-      <li>
-          <button class="btn" onclick="my_modal_4.showModal()">Direccion</button>
-          <dialog id="my_modal_4" class="modal">
-            <div class="modal-box w-11/12 max-w-5xl">
-              <p> <H2>Departamento de ciencias juridicas</H2> </p>
-              <figure>
-                <img src="https://uls.edu.sv/sitioweb/images/2022/IMG_5547.JPG" alt="Shoes" />
-              </figure>
-              <div class="modal-action">
-                <form method="dialog">
-                  <!-- if there is a button, it will close the modal -->
-                  <button class="btn">Close</button>
-                </form>
-              </div>
-            </div>
-          </dialog>
-        </li>
+
+      <!-- Modal -->
+      <dialog :open="myModal" class="modal">
+        <div class="modal-box w-full max-w-2xl">
+          <h4 class="text-center text-xl font-semibold">Departamento de Ciencias Jurídicas</h4>
+          <figure class="mt-4">
+            <img
+              class="w-full h-96 object-cover rounded-lg"
+              src="https://uls.edu.sv/sitioweb/images/2022/IMG_5547.JPG"
+              alt="Imagen de la facultad"
+            />
+          </figure>
+          <div class="modal-action mt-4 flex justify-center">
+            <button
+              class="btn btn-secondary"
+              @click="myModal = false"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </dialog>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+
+const myModal = ref(false);
+</script>
+
+<style scoped>
+/* Puedes agregar estilos adicionales aquí si es necesario */
+</style>

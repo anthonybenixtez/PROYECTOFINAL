@@ -1,41 +1,63 @@
 <template>
-  <div class="card bg-base-100 w-96 shadow-xl">
-    <figure>
-      <img
-        src="https://scontent.fsal1-1.fna.fbcdn.net/v/t39.30808-6/457564266_912162964286530_5356393626390497866_n.jpg?_nc_cat=101&ccb=1-7&_nc_sid=833d8c&_nc_eui2=AeEcRAd80zJOrr840twgbxa1YUczCXJKpQlhRzMJckqlCd_m6j1Uif1exFQuujimatu2zb044mQ5ntSjOvFirVaF&_nc_ohc=E0aIC354Mw4Q7kNvgF9DSXd&_nc_ht=scontent.fsal1-1.fna&_nc_gid=AFBzLBVXy4GY-2PSXA-ZMYr&oh=00_AYDANvE0z45rsCE8APay5kgW5Vo5eaBVbFBwzKCBoGBRpA&oe=670B9C1E"
-        alt="Shoes"
-      />
-    </figure>
-    <div class="card-body">
-      <h2 class="card-title">
-        Salva el planeta, planta un arbol hoy!
-        <div class="badge badge-secondary">Nuevo!!</div>
-      </h2>
-      <p>Ven y ayudanos a cuidar a nuestro planeta, plantando un arbol</p>
-      <div class="card-actions justify-end">
-        <div class="badge badge-outline">Agricultura</div>
+  <div class="flex justify-center items-center min-h-screen bg-gray-100">
+    <div class="card bg-base-200 w-96 shadow-xl rounded-2xl overflow-hidden">
+      <figure>
+        <img
+          class="w-full h-56 object-cover"
+          src="https://bienverdecordoba.com/blog/wp-content/uploads/2024/03/plantando-arboles.jpg"
+          alt="Plantar un árbol"
+        />
+      </figure>
+      <div class="card-body p-6">
+        <h2 class="card-title text-2xl font-semibold text-gray-800">
+          Salva el planeta, planta un árbol hoy!
+          <div class="badge badge-secondary">Nuevo!!</div>
+        </h2>
+        <p class="text-gray-700 mt-2 mb-4">
+          Ven y ayúdanos a cuidar nuestro planeta, plantando un árbol.
+        </p>
+        <div class="card-actions justify-between mt-4">
+          <div class="badge badge-outline text-lg text-gray-600">Agricultura</div>
+          <button
+            class="btn btn-primary"
+            @click="myModal = true"
+          >
+            Dirección
+          </button>
+        </div>
       </div>
-      <li>
-        <button class="btn" onclick="my_modal_4.showModal()">Direccion</button>
-        <dialog id="my_modal_4" class="modal">
-          <div class="modal-box w-11/12 max-w-5xl">
-            <div>
-              <h4 class="text-center">Departamento de ciencias juridicas</h4>
-            </div>
-            <br />
-            <br />
-            <figure>
-              <img src="https://uls.edu.sv/sitioweb/images/2022/IMG_5547.JPG" alt="Shoes" />
-            </figure>
-            <div class="modal-action">
-              <form method="dialog">
-                <!-- if there is a button, it will close the modal -->
-                <button class="btn">Close</button>
-              </form>
-            </div>
+
+      <!-- Modal -->
+      <dialog :open="myModal" class="modal">
+        <div class="modal-box w-full max-w-2xl">
+          <h4 class="text-center text-xl font-semibold">Departamento de Ciencias Jurídicas</h4>
+          <figure class="mt-4">
+            <img
+              class="w-full h-96 object-cover rounded-lg"
+              src="https://uls.edu.sv/sitioweb/images/2022/IMG_5547.JPG"
+              alt="Imagen de la facultad"
+            />
+          </figure>
+          <div class="modal-action mt-4 flex justify-center">
+            <button
+              class="btn btn-secondary"
+              @click="myModal = false"
+            >
+              Cerrar
+            </button>
           </div>
-        </dialog>
-      </li>
+        </div>
+      </dialog>
     </div>
   </div>
 </template>
+
+<script setup>
+import { ref } from 'vue';
+
+const myModal = ref(false);
+</script>
+
+<style scoped>
+/* Aquí puedes agregar estilos adicionales si lo necesitas */
+</style>
