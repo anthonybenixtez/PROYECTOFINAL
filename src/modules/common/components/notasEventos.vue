@@ -40,7 +40,7 @@
             <img 
               v-if="editingIndex === index" 
               @click="saveEdit(note.id)" 
-              src="@/assets/images/save.svg" 
+              src="@/assets/images/check.svg" 
               alt="Guardar" 
               class="w-6 h-6 cursor-pointer" 
             />
