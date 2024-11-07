@@ -18,7 +18,7 @@
         class="absolute top-1/2 right-10 transform -translate-y-1/2 bg-white p-8 rounded-lg shadow-md w-1/4"
       >
         <h2 class="text-gray-900 text-lg mb-1 font-medium title-font">Feedback</h2>
-        <p class="leading-relaxed mb-5 text-gray-600">Busca tus tiendas más cercanas</p>
+        <p class="leading-relaxed mb-5 text-gray-600">Escribenos</p>
         <div class="relative mb-4">
           <label for="email" class="leading-7 text-sm text-gray-600">Email</label>
           <input
@@ -44,7 +44,7 @@
         >
           Enviar
         </button>
-        <p class="text-xs text-gray-500 mt-3">The Pokemon Company.</p>
+        <p class="text-xs text-gray-500 mt-3">Universidad Luterana Salvadoreña.</p>
       </div>
     </div>
   </section>
