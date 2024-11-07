@@ -1,4 +1,13 @@
 <template>
+  <div>
+    <button class="btn">
+      <router-link to="/forciencias" active-class="active-link">AGREGAR EVENTO</router-link>
+    </button>
+  </div>
+  <br>
+  <br>
+  <br>
+
   <div class="flex gap-10">
     <div class="card bg-base-100 w-96 shadow-xl">
       <figure>

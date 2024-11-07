@@ -45,6 +45,11 @@ const router = createRouter({
       path: '/ContactoPagina',
       name: 'ContactoPagina',
       component: () => import('@/modules/pages/ContactoPagina.vue'),
+    },
+    {
+      path: '/forciencias',
+      name: 'form_ciencias',
+      component: () => import('@/modules/pages/forciencias.vue'),
       meta: { requiresAuth: true },
     },
   ],
