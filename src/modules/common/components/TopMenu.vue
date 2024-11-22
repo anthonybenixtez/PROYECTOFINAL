@@ -48,14 +48,20 @@
                   </router-link>
                 </li>
                 <li>
-                  <router-link to="/ContactoPagina" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
-                    <i class="fas fa-envelope h-6 w-6 mr-2"></i>
-                    Contáctanos
+                  <router-link to="/CienciasComp" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+                    <i class="fas fa-laptop h-6 w-6 mr-2"></i>
+                    Lic. en Ciencias de la Computacion
                   </router-link>
                 </li>
               </ul>
             </details>
           </li>
+          <li>
+                  <router-link to="/ContactoPagina" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+                    <i class="fas fa-envelope h-6 w-6 mr-2"></i>
+                    Contáctanos
+                  </router-link>
+                </li>
           <li>
             <router-link to="/calendario" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
               <i class="fas fa-calendar-alt h-6 w-6 mr-2"></i>

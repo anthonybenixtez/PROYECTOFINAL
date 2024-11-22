@@ -47,6 +47,11 @@ const router = createRouter({
       name: 'form_ciencias',
       component: () => import('@/modules/pages/forciencias.vue'),
     },
+    {
+      path: '/CienciasComp',
+      name: 'CienciasComp',
+      component: () => import('@/modules/pages/CienciasComp.vue'),
+    },
   ],
 });
 
