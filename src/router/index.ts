@@ -54,6 +54,11 @@ const router = createRouter({
       component: () => import('@/modules/pages/forciencias.vue'),
       meta: { requiresAuth: true },
     },
+    {
+      path: '/CienciasComp',
+      name: 'CienciasComp',
+      component: () => import('@/modules/pages/CienciasComp.vue'),
+    },
   ],
 });
 

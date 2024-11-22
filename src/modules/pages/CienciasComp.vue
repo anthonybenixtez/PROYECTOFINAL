@@ -21,7 +21,7 @@
           </h2>
           <p class="text-gray-700 mt-2 mb-4">{{ evento.descripcion }}</p>
           <div class="card-actions justify-between mt-4 space-x-4">
-            <div class="badge badge-outline text-lg text-gray-600">Agricultura</div>
+            <div class="badge badge-outline text-lg text-gray-600">Ciencias de la Computación</div>
           </div>
         </div>
 
@@ -101,14 +101,14 @@ const nuevoEvento = ref({
   titulo: '',
   imagen: '',
   descripcion: '',
-  categoria: 'agricultura',
+  categoria: 'ciencias de la computación',
   nuevo: true
 });
 
 // Cargar eventos al montar el componente
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'agricultura'); // Filtrar por categoría
+  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias de la computación'); // Filtrar por categoría
 });
 
 // Agregar un nuevo evento
@@ -119,7 +119,7 @@ const agregarEvento = () => {
     titulo: '',
     imagen: '',
     descripcion: '',
-    categoria: 'agricultura', // Asegurarte de asignar la categoría
+    categoria: 'ciencias de la computación', // Asegurarte de asignar la categoría
     nuevo: true
   };
 };
@@ -139,7 +139,7 @@ const guardarEvento = async () => {
       await agregarEventoFirestore({ ...nuevoEvento.value });
     }
     const todosLosEventos = await obtenerEventosFirestore();
-    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'agricultura'); // Actualizar eventos filtrados
+    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias de la computación'); // Actualizar eventos filtrados
     showForm.value = false;
   } else {
     alert('Por favor, ingresa un título y una imagen para el evento');
@@ -150,7 +150,7 @@ const guardarEvento = async () => {
 const eliminarEvento = async (id) => {
   await eliminarEventoFirestore(id);
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'agricultura');
+  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias de la computación');
 };
 
 // Mostrar dirección en el modal
