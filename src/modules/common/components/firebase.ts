@@ -2,7 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc } from 'firebase/firestore';
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -35,12 +35,21 @@ onAuthStateChanged(auth, (user) => {
 // Función para agregar un evento a Firestore
 async function agregarEventoFirestore(evento: { titulo: string, imagen: string, descripcion: string }) {
   try {
-    const docRef = await addDoc(collection(db, "eventos"), evento);
+    const docRef = await addDoc(collection(db, "eventos"), { ...evento, nuevo: true });
     console.log("Evento agregado con ID: ", docRef.id);
   } catch (e) {
     console.error("Error añadiendo documento: ", e);
   }
 }
+
+// Escuchar eventos en tiempo real
+export const escucharEventosFirestore = (callback: (eventos: any[]) => void) => {
+  const eventosRef = collection(db, 'eventos');
+  return onSnapshot(eventosRef, (snapshot) => {
+    const eventos = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+    callback(eventos);
+  });
+};
 
 // Función para obtener todos los eventos desde Firestore
 async function obtenerEventosFirestore() {
@@ -52,6 +61,7 @@ async function obtenerEventosFirestore() {
     return [];
   }
 }
+
 
 // Función para actualizar un evento en Firestore
 async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string }) {
@@ -78,6 +88,7 @@ async function eliminarEventoFirestore(id: string) {
     console.error("Error eliminando documento: ", e);
   }
 }
+
 
 // Exporta la autenticación, Firestore y las funciones
 export { auth, db, agregarEventoFirestore, obtenerEventosFirestore, actualizarEventoFirestore, eliminarEventoFirestore };
