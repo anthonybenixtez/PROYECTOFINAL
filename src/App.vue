@@ -1,5 +1,5 @@
 <template>
-  <!-- Renderiza el Navbar solo si no estás en la página de inicio de sesión -->
+  <!-- Renderiza el Navbar solo si no estás en la página de login -->
   <Navbar v-if="!isLoginPage" /> 
 
   <!-- Main -->
@@ -14,7 +14,7 @@ import { useRoute } from 'vue-router';
 import Navbar from './modules/common/components/TopMenu.vue';
 
 const route = useRoute();
-const isLoginPage = computed(() => route.name === 'paginaprincipal'); // Asegúrate de que coincida con el nombre de la ruta
+const isLoginPage = computed(() => route.name === 'login'); // Verifica si la ruta es la de login
 </script>
 
 <style scoped>

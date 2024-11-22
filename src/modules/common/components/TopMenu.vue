@@ -63,6 +63,12 @@
             </router-link>
           </li>
           <li>
+            <router-link to="/login" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+              <i class="fas fa-sign-in-alt h-6 w-6 mr-2"></i>
+              Iniciar Sesión
+            </router-link>
+          </li>
+          <li>
             <router-link to="/" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
               <i class="fas fa-sign-out-alt h-6 w-6 mr-2"></i>
               Cerrar Sesión
