@@ -90,10 +90,6 @@
 
     <!-- Navbar End -->
     <div class="navbar-end space-x-3">
-      <!-- Search Button -->
-      <button class="btn btn-ghost btn-circle text-white">
-        <i class="fas fa-search h-6 w-6"></i>
-      </button>
 
       <!-- Notification Button -->
       <button class="btn btn-ghost btn-circle text-white" @click="abrirNotificaciones">
