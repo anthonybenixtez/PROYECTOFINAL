@@ -1,12 +1,12 @@
 <template>
   <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div class="bg-primary p-4 rounded-lg w-full max-w-md max-h-[85vh] overflow-y-auto shadow-lg relative">
-      <h3 class="text-lg font-bold mb-4 text-black">Añadir recordatorio para {{ selectedDate }}</h3>
+      <h3 class="text-lg font-bold mb-4 text-black">Añadir una invitacion publica para el dia {{ selectedDate }}</h3>
       
       <input 
         v-model="newNote" 
         type="text" 
-        placeholder="Escribe un recordatorio" 
+        placeholder="Escribe una invitacion" 
         class="w-full p-2 border border-gray-300 rounded mb-3 text-sm text-black bg-white" 
       />
       

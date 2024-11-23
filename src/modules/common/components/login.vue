@@ -31,15 +31,7 @@
           Iniciar Sesión
         </button>
       </form>
-      
-      <!-- Botón de cierre de sesión -->
-      <button 
-        v-if="isLoggedIn" 
-        @click="handleSignOut" 
-        class="mt-4 text-sm text-red-600 hover:underline"
-      >
-        Cerrar sesión
-      </button>
+
     </div>
   </div>
 </template>
@@ -57,39 +49,23 @@ const router = useRouter();
 
 const handleSubmit = async () => {
   try {
-    // Iniciar sesión
-    await signInWithEmailAndPassword(auth, email.value, password.value);
-    isLoggedIn.value = true;  // Cambia el estado a 'logueado'
-    alert('Inicio de sesión exitoso');
-    router.push('/home'); // Redirige a la página de inicio
-  } catch (error: unknown) {
-    console.error(error);
-
-    if (error instanceof Error) {
-      alert(error.message);
-    } else {
-      alert('Error desconocido');
-    }
+    const userCredential = await signInWithEmailAndPassword(auth, email.value, password.value);
+    console.log('Usuario autenticado:', userCredential.user);
+    isLoggedIn.value = true; // Cambia el estado cuando el usuario se autentica correctamente
+    router.push('/home');  // Redirige a la página de inicio después de iniciar sesión
+  } catch (error) {
+    console.error('Error de autenticación:', error);
   }
 };
 
-// Función para cerrar sesión
 const handleSignOut = async () => {
   try {
-    await signOut(auth); // Cerrar sesión en Firebase
-    isLoggedIn.value = false; // Cambia el estado a 'no logueado'
-    alert('Has cerrado sesión');
-    
-    // Redirige a la página principal después de cerrar sesión
-    router.push('/home');  // Redirige correctamente a '/home' para mostrar la página principal
-  } catch (error: unknown) {
-    console.error(error);
-
-    if (error instanceof Error) {
-      alert(error.message);
-    } else {
-      alert('Error desconocido');
-    }
+    await signOut(auth);
+    console.log('Usuario desconectado');
+    isLoggedIn.value = false; // Cambia el estado al cerrar sesión
+    router.push('/login');  // Redirige a la página de login después de cerrar sesión
+  } catch (error) {
+    console.error('Error al cerrar sesión:', error);
   }
 };
 </script>

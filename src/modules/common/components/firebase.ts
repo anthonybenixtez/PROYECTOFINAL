@@ -4,6 +4,7 @@ import { getAnalytics } from "firebase/analytics";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
 
+
 // Configuración de Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyC0_rwVbERbSQqvakowb3AXJoVcRIcJLKc",
@@ -22,15 +23,15 @@ const auth = getAuth(app);
 const db = getFirestore(app);  // Instancia de Firestore
 
 // Suscripción para la persistencia de la sesión de usuario
+
 onAuthStateChanged(auth, (user) => {
   if (user) {
-    // Aquí puedes manejar lo que suceda cuando el usuario esté autenticado
-    console.log('Usuario autenticado:', user);
+    console.log("Usuario aún autenticado:", user);
   } else {
-    // Aquí puedes manejar lo que suceda cuando el usuario no esté autenticado
-    console.log('No hay usuario autenticado');
+    console.log("No hay usuario autenticado");
   }
 });
+
 
 // Función para agregar un evento a Firestore
 async function agregarEventoFirestore(evento: { titulo: string, imagen: string, descripcion: string }) {
@@ -64,13 +65,15 @@ async function obtenerEventosFirestore() {
 
 
 // Función para actualizar un evento en Firestore
-async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string }) {
+async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string, categoria: string }) {
   try {
     const eventoRef = doc(db, "eventos", evento.id); // Referencia al documento del evento
     await updateDoc(eventoRef, {
       titulo: evento.titulo,
       imagen: evento.imagen,
-      descripcion: evento.descripcion
+      descripcion: evento.descripcion,
+      categoria: evento.categoria
+      
     });
     console.log("Evento actualizado con ID: ", evento.id);
   } catch (e) {
@@ -88,6 +91,8 @@ async function eliminarEventoFirestore(id: string) {
     console.error("Error eliminando documento: ", e);
   }
 }
+
+
 
 
 // Exporta la autenticación, Firestore y las funciones

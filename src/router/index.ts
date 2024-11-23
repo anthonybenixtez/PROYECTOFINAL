@@ -17,6 +17,7 @@ const router = createRouter({
       name: 'login',
       component: () => import('@/modules/common/components/paginaprincipal.vue'),
     },
+    
     {
       path: '/juri',
       name: 'ciencias_juridicas',
