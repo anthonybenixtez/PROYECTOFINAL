@@ -105,7 +105,7 @@ const showNotification = (message: string) => {
 <style scoped>
 .welcome-container {
   text-align: center;
-  margin-bottom: 40px;
+  margin-bottom: 20px;
   padding: 20px;
 }
 
