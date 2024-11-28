@@ -1,6 +1,6 @@
 <template>
   <div class="welcome-container">
-    <h1 class="welcome-title">¡Bienvenido a nuestra Página web!</h1>
+    <h2 class="welcome-title">¡Bienvenido a nuestra Página web!</h2>
     <p class="welcome-subtitle">
       Explora los eventos de nuestra universidad de forma rápida y sencilla
     </p>
@@ -11,7 +11,7 @@
 .welcome-container {
   text-align: center;
   margin-bottom: 40px;
-  padding: 20px;
+  padding: 5px;
 }
 
 .welcome-title {
