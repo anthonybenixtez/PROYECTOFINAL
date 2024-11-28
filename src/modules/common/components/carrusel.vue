@@ -10,7 +10,7 @@
               alt="Card Image"
               class="card-image"
             />
-            <div class="card-content">
+            <div class="card-content" style="color:#4caf50">
               Ir a carrera
             </div>
           </div>
@@ -65,7 +65,7 @@
               class="card-image"
             />
             <div class="card-content">
-              Ir a carrera
+              <h1>Ir a carrera</h1>
             </div>
           </div>
         </div>
@@ -160,54 +160,51 @@ const showNotification = (message: string) => {
 </script>
 
 <style scoped>
-.carousel-container {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center; /* Centrar horizontalmente */
-  align-items: center; /* Centrar verticalmente */
-  margin-bottom: 100px; /* Espacio adicional para evitar solapamiento */
-}
-
 .card-container {
-  margin: 20px;
-  width: 280px; /* Ajuste el tamaño de las tarjetas */
+  margin: 47px;
+  width: 100%; /* Ancho inicial para pantallas pequeñas */
+  max-width: 400px; /* Máximo ancho de cada tarjeta */
+  min-width: 200px; /* Mínimo ancho para evitar que sean muy pequeñas */
   perspective: 1000px;
+  transition: all 0.3s ease;
 }
 
 .card {
   border-radius: 10px;
   overflow: hidden;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  transform: rotateY(10deg);
+  box-shadow: 0 4px px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .card:hover {
-  transform: rotateY(0deg) translateY(-10px);
+  transform: translateY(-10px);
   box-shadow: 0 8px 15px rgba(0, 0, 0, 0.2);
 }
 
 .card-image {
-  width: 100%;
+  width: 10cm;
   height: auto;
   object-fit: cover;
 }
 
-.card-content {
-  padding: 10px;
-  text-align: center;
+.carousel-container {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0px; /* Espaciado entre tarjetas */
 }
 
-button, .group {
-  z-index: 50; /* Asegura que los botones flotantes estén encima de las tarjetas */
+/* Responsividad */
+@media (max-width: 1024px) {
+  .card-container {
+    width: calc(100% - 10px); /* Dos tarjetas por fila */
+  }
 }
 
-/* Estilo de los botones flotantes */
-.fixed {
-  position: fixed;
+@media (max-width: 768px) {
+  .card-container {
+    width: calc(100% - 10px); /* Una tarjeta por fila */
+  }
 }
 
-.group-hover\:scale-110:hover {
-  transform: scale(1.1);
-}
 </style>
