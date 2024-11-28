@@ -35,6 +35,7 @@
 
         <!-- Botón Editar (derecha) -->
         <button
+        v-if="isLoggedIn"
           class="btn bg-gray-500 hover:bg-gray-600 text-white rounded-full p-3 absolute bottom-4 right-4"
           @click="editarEvento(evento)"
         >
@@ -44,7 +45,7 @@
     </div>
 
     <!-- Botón para agregar un nuevo evento -->
-    <div>
+    <div v-if="isLoggedIn">
       <button
         class="btn bg-gradient-to-r from-blue-500 to-teal-500 hover:from-teal-500 hover:to-blue-500 text-white rounded-full shadow-xl fixed bottom-5 right-5 w-16 h-16 flex items-center justify-center text-4xl transition-transform transform hover:scale-110 active:scale-100 focus:outline-none focus:ring-4 focus:ring-teal-500"
         @click="agregarEvento"
@@ -83,6 +84,12 @@
 </template>
 
 <script setup>
+
+import { useAuthState } from "../common/components/authState.ts";
+// Estado de autenticación
+const { isLoggedIn } = useAuthState();
+
+
 import { ref, onMounted } from 'vue';
 import {
   obtenerEventosFirestore,

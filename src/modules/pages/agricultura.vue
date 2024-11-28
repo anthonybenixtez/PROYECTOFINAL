@@ -25,7 +25,7 @@
           </div>
         </div>
 
-        <!-- Botón Dirección (izquierda) -->
+        <!-- Botón Dirección (visible siempre) -->
         <button
           class="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 absolute bottom-4 left-4"
           @click="verDireccion(evento)"
@@ -33,8 +33,9 @@
           <i class="fas fa-map-marker-alt"></i>
         </button>
 
-        <!-- Botón Editar (derecha) -->
+        <!-- Botón Editar (oculto si no está logueado) -->
         <button
+          v-if="isLoggedIn"
           class="btn bg-gray-500 hover:bg-gray-600 text-white rounded-full p-3 absolute bottom-4 right-4"
           @click="editarEvento(evento)"
         >
@@ -43,8 +44,8 @@
       </div>
     </div>
 
-    <!-- Botón para agregar un nuevo evento -->
-    <div>
+    <!-- Botón para agregar un nuevo evento (oculto si no está logueado) -->
+    <div v-if="isLoggedIn">
       <button
         class="btn bg-gradient-to-r from-blue-500 to-teal-500 hover:from-teal-500 hover:to-blue-500 text-white rounded-full shadow-xl fixed bottom-5 right-5 w-16 h-16 flex items-center justify-center text-4xl transition-transform transform hover:scale-110 active:scale-100 focus:outline-none focus:ring-4 focus:ring-teal-500"
         @click="agregarEvento"
@@ -83,43 +84,49 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 import {
   obtenerEventosFirestore,
   agregarEventoFirestore,
   actualizarEventoFirestore,
   eliminarEventoFirestore
-} from '@/modules/common/components/firebase';
-import FormularioEvento from '../common/components/FormularioEvento.vue';
+} from "@/modules/common/components/firebase";
+import FormularioEvento from "../common/components/FormularioEvento.vue";
+import { useAuthState } from "../common/components/authState.ts";
+
+// Estado de autenticación
+const { isLoggedIn } = useAuthState();
 
 // Estados reactivos
 const myModal = ref(false);
 const showForm = ref(false);
 const eventos = ref([]);
 const nuevoEvento = ref({
-  id: '',
-  titulo: '',
-  imagen: '',
-  descripcion: '',
-  categoria: 'agricultura',
+  id: "",
+  titulo: "",
+  imagen: "",
+  descripcion: "",
+  categoria: "agricultura",
   nuevo: true
 });
 
 // Cargar eventos al montar el componente
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'agricultura'); // Filtrar por categoría
+  eventos.value = todosLosEventos.filter(
+    (evento) => evento.categoria === "agricultura"
+  ); // Filtrar por categoría
 });
 
 // Agregar un nuevo evento
 const agregarEvento = () => {
   showForm.value = true;
   nuevoEvento.value = {
-    id: '',
-    titulo: '',
-    imagen: '',
-    descripcion: '',
-    categoria: 'agricultura', // Asegurarte de asignar la categoría
+    id: "",
+    titulo: "",
+    imagen: "",
+    descripcion: "",
+    categoria: "agricultura", // Asegúrate de asignar la categoría
     nuevo: true
   };
 };
@@ -139,10 +146,12 @@ const guardarEvento = async () => {
       await agregarEventoFirestore({ ...nuevoEvento.value });
     }
     const todosLosEventos = await obtenerEventosFirestore();
-    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'agricultura'); // Actualizar eventos filtrados
+    eventos.value = todosLosEventos.filter(
+      (evento) => evento.categoria === "agricultura"
+    ); // Actualizar eventos filtrados
     showForm.value = false;
   } else {
-    alert('Por favor, ingresa un título y una imagen para el evento');
+    alert("Por favor, ingresa un título y una imagen para el evento");
   }
 };
 
@@ -150,7 +159,9 @@ const guardarEvento = async () => {
 const eliminarEvento = async (id) => {
   await eliminarEventoFirestore(id);
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'agricultura');
+  eventos.value = todosLosEventos.filter(
+    (evento) => evento.categoria === "agricultura"
+  );
 };
 
 // Mostrar dirección en el modal

@@ -69,10 +69,15 @@
             </router-link>
           </li>
           <li>
-            <router-link to="/" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
-              <i class="fas fa-sign-out-alt h-6 w-6 mr-2"></i>
-              Cerrar Sesión
+            <router-link to="/login" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center">
+              <i class="fas fa-sign-in-alt h-6 w-6 mr-2"></i>
+              Iniciar Sesión
             </router-link>
+          </li>
+          <li>
+            <router-link to="/home" active-class="active-link" class="hover:text-blue-500 text-gray-800 flex items-center" @click="handleSignOut">
+            <i class="fas fa-sign-out-alt h-6 w-6 mr-2"></i> Cerrar Sesión
+          </router-link>
           </li>
         </ul>
       </div>
@@ -85,10 +90,6 @@
 
     <!-- Navbar End -->
     <div class="navbar-end space-x-3">
-      <!-- Search Button -->
-      <button class="btn btn-ghost btn-circle text-white">
-        <i class="fas fa-search h-6 w-6"></i>
-      </button>
 
       <!-- Notification Button -->
       <button class="btn btn-ghost btn-circle text-white" @click="abrirNotificaciones">
@@ -113,6 +114,8 @@
       >
         <p><strong>Título:</strong> {{ evento.titulo }}</p>
         <p><strong>Descripción:</strong> {{ evento.descripcion }}</p>
+        <p><strong>Carrera:</strong> {{ evento.categoria }}</p>
+
       </li>
     </ul>
     <div class="modal-action">
@@ -124,8 +127,14 @@
 </template>
 
 <script setup>
+
+
+
+
+import { useAuth } from '@/modules/common/components/useAuth.ts'; // Asegúrate de usar la ruta correcta
 import { ref, onMounted, onBeforeUnmount } from 'vue';
 import { escucharEventosFirestore, actualizarEventoFirestore } from '@/modules/common/components/firebase';
+const { handleSignOut } = useAuth();
 
 const isMenuOpen = ref(false);
 const eventos = ref([]);
@@ -192,12 +201,14 @@ onBeforeUnmount(() => {
 
 
 <style scoped>
-/* Estilos específicos para el modal de notificaciones */
 .notificaciones-modal .modal-box {
   background: linear-gradient(135deg, #ffffff, #f0f8ff);
   border-radius: 10px;
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  width: 80%; /* Ajusta el porcentaje para hacerlo más ancho */
+  max-width: 900px; /* Limita el ancho máximo para pantallas grandes */
 }
+
 
 .notificaciones-modal h3 {
   color: #1e40af; /* Azul oscuro */
@@ -251,7 +262,7 @@ onBeforeUnmount(() => {
 }
 
 .notificaciones-modal ul li.visto::before {
-  content: '✔️'; /* Check */
+  content: '✓✓'; /* Check */
   color: #6b7280; /* Gris oscuro */
 }
 

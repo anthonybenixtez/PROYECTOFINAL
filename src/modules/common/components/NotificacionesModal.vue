@@ -14,6 +14,7 @@
         >
           <p><strong>Título:</strong> {{ evento.titulo }}</p>
           <p><strong>Descripción:</strong> {{ evento.descripcion }}</p>
+          <p><strong>Carrera:</strong> {{ evento.categoria }}</p>
         </li>
 
       </ul>
@@ -37,7 +38,7 @@ import { PropType } from 'vue';
 // Props
 const eventos = defineProps({
   eventos: {
-    type: Array as PropType<Array<{ titulo: string; descripcion: string }>>,
+    type: Array as PropType<Array<{ titulo: string; descripcion: string, categoria: string }>>,
     required: true,
   },
 });
