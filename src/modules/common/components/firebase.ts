@@ -2,8 +2,7 @@
 import { initializeApp } from "firebase/app";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot } from 'firebase/firestore';
-
+import { getFirestore, collection, addDoc, getDocs, doc, updateDoc, deleteDoc, onSnapshot, query, where } from 'firebase/firestore';
 
 // Configuración de Firebase
 const firebaseConfig = {
@@ -23,7 +22,6 @@ const auth = getAuth(app);
 const db = getFirestore(app);  // Instancia de Firestore
 
 // Suscripción para la persistencia de la sesión de usuario
-
 onAuthStateChanged(auth, (user) => {
   if (user) {
     console.log("Usuario aún autenticado:", user);
@@ -32,11 +30,13 @@ onAuthStateChanged(auth, (user) => {
   }
 });
 
-
 // Función para agregar un evento a Firestore
-async function agregarEventoFirestore(evento: { titulo: string, imagen: string, descripcion: string }) {
+async function agregarEventoFirestore(evento: { titulo: string, imagen: string, descripcion: string, fecha: string }) {
   try {
-    const docRef = await addDoc(collection(db, "eventos"), { ...evento, nuevo: true });
+    const docRef = await addDoc(collection(db, "eventos"), { 
+      ...evento, 
+      nuevo: true // Marca como evento nuevo
+    });
     console.log("Evento agregado con ID: ", docRef.id);
   } catch (e) {
     console.error("Error añadiendo documento: ", e);
@@ -63,18 +63,33 @@ async function obtenerEventosFirestore() {
   }
 }
 
+// Función para obtener eventos de Firestore por fecha
+export const obtenerEventosPorFecha = async (fecha: string) => {
+  try {
+    const eventosRef = collection(db, "eventos");
+    const q = query(eventosRef, where("fecha", "==", fecha)); // Buscar eventos con la fecha dada
+    const querySnapshot = await getDocs(q);
+    return querySnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+  } catch (e) {
+    console.error("Error obteniendo eventos por fecha: ", e);
+    return [];
+  }
+};
 
 // Función para actualizar un evento en Firestore
-async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string, categoria: string }) {
+async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string, categoria?: string, fecha?: string }) {
   try {
     const eventoRef = doc(db, "eventos", evento.id); // Referencia al documento del evento
-    await updateDoc(eventoRef, {
+    const updateData: any = {
       titulo: evento.titulo,
       imagen: evento.imagen,
       descripcion: evento.descripcion,
-      categoria: evento.categoria
-      
-    });
+    };
+
+    if (evento.categoria) updateData.categoria = evento.categoria;
+    if (evento.fecha) updateData.fecha = evento.fecha;
+
+    await updateDoc(eventoRef, updateData);
     console.log("Evento actualizado con ID: ", evento.id);
   } catch (e) {
     console.error("Error actualizando documento: ", e);
@@ -91,9 +106,6 @@ async function eliminarEventoFirestore(id: string) {
     console.error("Error eliminando documento: ", e);
   }
 }
-
-
-
 
 // Exporta la autenticación, Firestore y las funciones
 export { auth, db, agregarEventoFirestore, obtenerEventosFirestore, actualizarEventoFirestore, eliminarEventoFirestore };

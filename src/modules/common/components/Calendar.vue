@@ -2,15 +2,15 @@
   <div class="flex flex-col h-screen w-full">
     <h2 class="text-center text-3xl font-bold mb-4 mt-4">Calendario</h2>
     <div class="flex justify-between items-center mb-4 px-4">
-        <button @click="prevMonth" class="bg-gray-300 px-4 py-2 rounded flex items-center">
+      <button @click="prevMonth" class="bg-gray-300 px-4 py-2 rounded flex items-center">
         <img src="@/assets/images/arrow-left.svg" alt="Anterior" class="w-6 h-6" />
-        </button>
-        <span class="font-semibold text-xl">{{ monthYear }}</span>
-        <button @click="nextMonth" class="bg-gray-300 px-4 py-2 rounded flex items-center">
+      </button>
+      <span class="font-semibold text-xl">{{ monthYear }}</span>
+      <button @click="nextMonth" class="bg-gray-300 px-4 py-2 rounded flex items-center">
         <img src="@/assets/images/arrow-right.svg" alt="Siguiente" class="w-6 h-6" />
-        </button>
-
+      </button>
     </div>
+
     <div class="grid grid-cols-7 gap-2 text-center flex-grow w-full">
       <div v-for="(day, index) in days" :key="index" class="font-semibold">
         {{ day }}
@@ -34,11 +34,12 @@
       </div>
     </div>
 
-    <!-- Modal de notas -->
+    <!-- Modal de notas y eventos -->
     <notasEventos
       v-if="showModal"
       :show-modal="showModal"
       :selected-date="formattedSelectedDate"
+      :eventos="eventosDelDia"
       @close="closeModal"
     />
   </div>
@@ -48,7 +49,7 @@
 import { defineComponent, ref, computed, onMounted } from 'vue';
 import NotasEventos from '@/modules/common/components/notasEventos.vue';
 import { db } from '@/modules/common/components/firebase';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { collection, onSnapshot, query, where, getDocs } from 'firebase/firestore';
 import { getAuth } from 'firebase/auth';
 
 export default defineComponent({
@@ -61,6 +62,7 @@ export default defineComponent({
       currentYear: new Date().getFullYear(),
       showModal: false,
       noteCounts: {} as { [key: number]: number }, // Contador de notas por fecha
+      eventosDelDia: [], // Array para guardar eventos del día
     };
   },
   computed: {
@@ -80,26 +82,50 @@ export default defineComponent({
       return `${monthNames[this.currentMonth]} ${this.currentYear}`;
     },
     formattedSelectedDate() {
-      return `${this.selectedDate}/${this.currentMonth + 1}/${this.currentYear}`; 
+      return `${this.selectedDate}/${this.currentMonth + 1}/${this.currentYear}`;
     },
   },
   methods: {
     openModal(date: number) {
       this.selectedDate = date;
       this.showModal = true;
+
+      // Formatear la fecha seleccionada para buscar los eventos
+      const formattedDate = `${date}/${this.currentMonth + 1}/${this.currentYear}`;
+      
+      // Obtener eventos de la fecha seleccionada
+      this.obtenerEventosPorFecha(formattedDate);
     },
+
+    async obtenerEventosPorFecha(fecha: string) {
+      const eventos = await this.fetchEventosPorFecha(fecha);
+      this.eventosDelDia = eventos;
+    },
+
+    async fetchEventosPorFecha(fecha: string) {
+      const eventosRef = collection(db, "eventos");
+      const q = query(eventosRef, where("fecha", "==", fecha));
+      const querySnapshot = await getDocs(q);
+      const eventos = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      return eventos;
+    },
+
     closeModal() {
       this.showModal = false;
       this.selectedDate = null;
+      this.eventosDelDia = []; // Limpiar eventos al cerrar modal
     },
+
     isSelected(date: number) {
       return this.selectedDate === date;
     },
+
     isToday(date: number) {
       return date === this.today.getDate() && 
              this.currentMonth === new Date().getMonth() && 
              this.currentYear === new Date().getFullYear();
     },
+
     prevMonth() {
       if (this.currentMonth === 0) {
         this.currentMonth = 11;
@@ -109,6 +135,7 @@ export default defineComponent({
       }
       this.fetchNoteCounts();
     },
+
     nextMonth() {
       if (this.currentMonth === 11) {
         this.currentMonth = 0;
@@ -118,7 +145,8 @@ export default defineComponent({
       }
       this.fetchNoteCounts();
     },
-    fetchNoteCounts() {
+
+    async fetchNoteCounts() {
       const auth = getAuth();
       const user = auth.currentUser;
       this.noteCounts = {}; // Reiniciar el contador
