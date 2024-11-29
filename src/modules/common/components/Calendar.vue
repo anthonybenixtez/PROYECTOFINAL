@@ -28,8 +28,19 @@
         }"
       >
         {{ date }}
-        <span v-if="noteCounts[date]" class="absolute top-0 right-0 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center">
+        <!-- Notificaciones para notas -->
+        <span
+          v-if="noteCounts[date]"
+          class="absolute top-0 right-4 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+        >
           {{ noteCounts[date] }}
+        </span>
+        <!-- Notificaciones para eventos -->
+        <span
+          v-if="eventCounts[date]"
+          class="absolute top-0 right-0 bg-yellow-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
+        >
+          {{ eventCounts[date] }}
         </span>
       </div>
     </div>
@@ -44,6 +55,7 @@
     />
   </div>
 </template>
+
 
 <script lang="ts">
 import { defineComponent, ref, computed, onMounted } from 'vue';
@@ -62,6 +74,7 @@ export default defineComponent({
       currentYear: new Date().getFullYear(),
       showModal: false,
       noteCounts: {} as { [key: number]: number }, // Contador de notas por fecha
+      eventCounts: {} as { [key: number]: number }, // Contador de eventos por fecha
       eventosDelDia: [], // Array para guardar eventos del día
     };
   },
@@ -149,30 +162,34 @@ export default defineComponent({
     async fetchNoteCounts() {
       const auth = getAuth();
       const user = auth.currentUser;
-      this.noteCounts = {}; // Reiniciar el contador
+      this.noteCounts = {}; // Reiniciar contador de notas
+      this.eventCounts = {}; // Reiniciar contador de eventos
+
       if (user) {
         const notesCollection = collection(db, 'notes');
-        const q = query(
-          notesCollection,
-          where("userId", "==", user.uid)
-        );
+        const eventsCollection = collection(db, 'eventos');
+        const userQuery = where("userId", "==", user.uid);
 
-        // Usar onSnapshot para escuchar cambios en tiempo real
-        onSnapshot(q, (querySnapshot) => {
-          this.noteCounts = {}; // Reiniciar el contador cada vez que se actualizan los datos
-          querySnapshot.docs.forEach(doc => {
+        // Escucha cambios en tiempo real para notas
+        onSnapshot(query(notesCollection, userQuery), (querySnapshot) => {
+          this.noteCounts = {};
+          querySnapshot.docs.forEach((doc) => {
             const noteData = doc.data();
-            const noteDateParts = noteData.date.split('/'); // Divide la cadena de la fecha
-            const noteDay = parseInt(noteDateParts[0]); // Día
-            const noteMonth = parseInt(noteDateParts[1]) - 1; // Mes (ajustar para que sea 0-indexado)
-            const noteYear = parseInt(noteDateParts[2]); // Año
+            const [noteDay, noteMonth, noteYear] = noteData.date.split('/').map(Number);
+            if (noteYear === this.currentYear && noteMonth - 1 === this.currentMonth) {
+              this.noteCounts[noteDay] = (this.noteCounts[noteDay] || 0) + 1;
+            }
+          });
+        });
 
-            // Solo cuenta las notas que corresponden al mes y año actuales
-            if (noteYear === this.currentYear && noteMonth === this.currentMonth) {
-              if (!this.noteCounts[noteDay]) {
-                this.noteCounts[noteDay] = 0;
-              }
-              this.noteCounts[noteDay]++;
+        // Escucha cambios en tiempo real para eventos
+        onSnapshot(query(eventsCollection, userQuery), (querySnapshot) => {
+          this.eventCounts = {};
+          querySnapshot.docs.forEach((doc) => {
+            const eventData = doc.data();
+            const [eventDay, eventMonth, eventYear] = eventData.fecha.split('/').map(Number);
+            if (eventYear === this.currentYear && eventMonth - 1 === this.currentMonth) {
+              this.eventCounts[eventDay] = (this.eventCounts[eventDay] || 0) + 1;
             }
           });
         });
@@ -184,6 +201,7 @@ export default defineComponent({
   },
 });
 </script>
+
 
 <style scoped>
 .max-w-md {

@@ -112,40 +112,38 @@ export default defineComponent({
       editingIndex.value = null;
       editNoteText.value = '';
     };
-
     const fetchNotes = () => {
-      if (props.selectedDate && user) {
-        const notesCollection = collection(db, 'notes');
-        const q = query(
-          notesCollection,
-          where("date", "==", props.selectedDate),
-          where("userId", "==", user.uid)
-        );
+  if (props.selectedDate) {
+    const notesCollection = collection(db, 'notes');
+    const q = query(
+      notesCollection,
+      where("date", "==", props.selectedDate)
+    );
 
-        onSnapshot(q, (querySnapshot) => {
-          notes.value = querySnapshot.docs.map(doc => ({
-            id: doc.id,
-            text: doc.data().note,
-          }));
-        });
-      }
-    };
+    onSnapshot(q, (querySnapshot) => {
+      notes.value = querySnapshot.docs.map(doc => ({
+        id: doc.id,
+        text: doc.data().note,
+      }));
+    });
+  }
+};
 
-    const saveNote = async () => {
-      if (newNote.value && props.selectedDate && user) {
-        try {
-          await addDoc(collection(db, 'notes'), {
-            note: newNote.value,
-            date: props.selectedDate, 
-            userId: user.uid,
-          });
-          newNote.value = '';
-          // No actualizamos el icono de notificación para notas
-        } catch (error) {
-          console.error("Error al guardar la nota: ", error);
-        }
-      }
-    };
+
+const saveNote = async () => {
+  if (newNote.value && props.selectedDate) {
+    try {
+      await addDoc(collection(db, 'notes'), {
+        note: newNote.value,
+        date: props.selectedDate,
+      });
+      newNote.value = '';
+    } catch (error) {
+      console.error("Error al guardar la nota: ", error);
+    }
+  }
+};
+
 
     const startEditing = (index: number) => {
       editingIndex.value = index;
@@ -153,13 +151,13 @@ export default defineComponent({
     };
 
     const saveEdit = async (noteId: string) => {
-      if (editNoteText.value && user) {
-        const noteDoc = doc(db, 'notes', noteId);
-        await updateDoc(noteDoc, { note: editNoteText.value });
-        editingIndex.value = null;
-        editNoteText.value = '';
-      }
-    };
+  if (editNoteText.value) {
+    const noteDoc = doc(db, 'notes', noteId);
+    await updateDoc(noteDoc, { note: editNoteText.value });
+    editingIndex.value = null;
+    editNoteText.value = '';
+  }
+};
 
     const cancelEdit = () => {
       editingIndex.value = null;
@@ -167,12 +165,9 @@ export default defineComponent({
     };
 
     const deleteNote = async (noteId: string) => {
-      if (user) {
-        const noteDoc = doc(db, 'notes', noteId);
-        await deleteDoc(noteDoc);
-        // No actualizamos el icono de notificación para notas
-      }
-    };
+  const noteDoc = doc(db, 'notes', noteId);
+  await deleteDoc(noteDoc);
+};
 
     const saveEvent = async (evento) => {
       if (props.selectedDate && user) {

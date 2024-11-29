@@ -86,14 +86,21 @@ const abrirNotificaciones = () => {
 const cerrarNotificaciones = async () => {
   mostrarNotificaciones.value = false;
   const eventosNuevos = eventosActualizados.value.filter(evento => !evento.nuevo);
+
   await Promise.all(
-    eventosNuevos.map(evento =>
-      actualizarEventoFirestore({ ...evento, nuevo: false })
-    )
+    eventosNuevos.map(evento => {
+      if (!evento.id || typeof evento.id !== "string") {
+        console.error(`Evento con ID inválido:`, evento);
+        return Promise.resolve(); // Ignorar eventos inválidos
+      }
+      return actualizarEventoFirestore({ ...evento, nuevo: false });
+    })
   );
+
   eventos.value = [...eventosActualizados.value];
   contadorNuevos.value = 0;
 };
+
 
 // Montar y desmontar
 onMounted(() => {

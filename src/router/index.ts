@@ -13,6 +13,10 @@ const router = createRouter({
       component: proyectlayout,
     },
     {
+      path: '/',
+      redirect: '/calendario',
+    },    
+    {
       path: '/login',
       name: 'login',
       component: () => import('@/modules/common/components/paginaprincipal.vue'),
