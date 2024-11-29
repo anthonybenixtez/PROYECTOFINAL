@@ -108,14 +108,14 @@ const nuevoEvento = ref({
   titulo: '',
   imagen: '',
   descripcion: '',
-  categoria: 'ciencias juridicas',
+  categoria: 'Ciencias Jurídicas',
   nuevo: true
 });
 
 // Cargar eventos al montar el componente
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias juridicas'); // Filtrar por categoría
+  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias Jurídicas'); // Filtrar por categoría
 });
 
 // Agregar un nuevo evento
@@ -126,7 +126,7 @@ const agregarEvento = () => {
     titulo: '',
     imagen: '',
     descripcion: '',
-    categoria: 'ciencias juridicas', // Asegurarte de asignar la categoría
+    categoria: 'Ciencias Jurídicas', // Asegurarte de asignar la categoría
     nuevo: true
   };
 };
@@ -146,7 +146,7 @@ const guardarEvento = async () => {
       await agregarEventoFirestore({ ...nuevoEvento.value });
     }
     const todosLosEventos = await obtenerEventosFirestore();
-    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias juridicas'); // Actualizar eventos filtrados
+    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias Jurídicas'); // Actualizar eventos filtrados
     showForm.value = false;
   } else {
     alert('Por favor, ingresa un título y una imagen para el evento');
@@ -157,7 +157,7 @@ const guardarEvento = async () => {
 const eliminarEvento = async (id) => {
   await eliminarEventoFirestore(id);
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias juridicas');
+  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias Jurídicas');
 };
 
 // Mostrar dirección en el modal

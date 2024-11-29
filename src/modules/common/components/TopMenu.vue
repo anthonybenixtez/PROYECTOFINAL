@@ -41,16 +41,45 @@
       <ul>
         <li
           v-for="(evento, index) in eventos"
-          :key="index"
-          :class="{'visto': !evento.nuevo}"
-          class="py-2 border-b"
+          :key="evento.id"
+          :class="{'visto': !evento.nuevo, 'eliminado': evento.eliminado}"
+          class="py-2 border-b flex justify-between items-center"
         >
-          <p><strong>Título:</strong> {{ evento.titulo }}</p>
-          <p><strong>Descripción:</strong> {{ evento.descripcion }}</p>
-          <p><strong>Carrera:</strong> {{ evento.categoria }}</p>
+          <!-- Campana al principio -->
+          <div class="flex items-center gap-2">
+            <i v-if="evento.nuevo" class="fas fa-bell text-yellow-500 text-lg"></i>
+            <i v-else class="fas fa-check-double text-gray-500 text-lg"></i>
+          </div>
+
+          <!-- Título, descripción y carrera en horizontal -->
+          <div class="flex-grow flex justify-between gap-4 items-center">
+            <div class="flex flex-col">
+              <p class="text-sm font-semibold">{{ evento.titulo }}</p>
+              <p class="text-xs">{{ evento.descripcion }}</p>
+            </div>
+            <p class="text-xs text-gray-500">{{ evento.categoria }}</p>
+          </div>
+
+          <!-- Opciones al final -->
+          <div class="flex items-center gap-2">
+            <input 
+              type="checkbox" 
+              v-model="eventoSeleccionado" 
+              :value="evento.id" 
+              class="checkbox"
+            />
+            <button 
+              v-if="!evento.eliminado"
+              @click="eliminarNotificacion(evento)"
+              class="text-red-500 hover:text-red-700 text-lg"
+            >
+              <i class="fas fa-trash-alt"></i>
+            </button>
+          </div>
         </li>
       </ul>
       <div class="modal-action">
+        <button class="btn btn-red" @click="eliminarSeleccionados">Eliminar seleccionados</button>
         <button class="btn" @click="cerrarNotificaciones">Cerrar</button>
       </div>
     </div>
@@ -64,43 +93,61 @@ import { escucharEventosFirestore, actualizarEventoFirestore } from '@/modules/c
 const eventos = ref([]);
 const contadorNuevos = ref(0);
 const mostrarNotificaciones = ref(false);
-const eventosActualizados = ref([]);
-
+const eventoSeleccionado = ref([]); // Lista de IDs de eventos seleccionados
 let unsubscribe = null;
 
 // Escuchar eventos en tiempo real
 const escucharEventos = () => {
   unsubscribe = escucharEventosFirestore((nuevosEventos) => {
-    eventos.value = nuevosEventos;
-    contadorNuevos.value = nuevosEventos.filter(evento => evento.nuevo).length;
+    eventos.value = nuevosEventos.filter(evento => !evento.eliminado);
+    contadorNuevos.value = nuevosEventos.filter(evento => evento.nuevo && !evento.eliminado).length;
   });
 };
 
 // Abrir modal de notificaciones
 const abrirNotificaciones = () => {
   mostrarNotificaciones.value = true;
-  eventosActualizados.value = eventos.value.map(evento => ({ ...evento, nuevo: false }));
+  eventoSeleccionado.value = []; // Reseteamos la selección al abrir el modal
 };
 
 // Cerrar modal y actualizar eventos
 const cerrarNotificaciones = async () => {
   mostrarNotificaciones.value = false;
-  const eventosNuevos = eventosActualizados.value.filter(evento => !evento.nuevo);
-
+  const eventosNuevos = eventos.value.filter(evento => !evento.nuevo);
   await Promise.all(
-    eventosNuevos.map(evento => {
-      if (!evento.id || typeof evento.id !== "string") {
-        console.error(`Evento con ID inválido:`, evento);
-        return Promise.resolve(); // Ignorar eventos inválidos
-      }
-      return actualizarEventoFirestore({ ...evento, nuevo: false });
-    })
+    eventosNuevos.map(evento =>
+      actualizarEventoFirestore({ ...evento, nuevo: false })
+    )
   );
-
-  eventos.value = [...eventosActualizados.value];
-  contadorNuevos.value = 0;
+  eventos.value = eventos.value.filter(evento => !evento.eliminado);
+  contadorNuevos.value = eventos.value.filter(evento => evento.nuevo && !evento.eliminado).length;
 };
 
+// Eliminar una notificación individualmente (basurero)
+const eliminarNotificacion = async (evento) => {
+  try {
+    await actualizarEventoFirestore({ ...evento, eliminado: true });
+    evento.eliminado = true;
+    contadorNuevos.value = eventos.value.filter(evento => evento.nuevo && !evento.eliminado).length;
+  } catch (error) {
+    console.error('Error al eliminar la notificación:', error);
+  }
+};
+
+// Eliminar notificaciones seleccionadas (checkbox)
+const eliminarSeleccionados = async () => {
+  const eventosSeleccionados = eventos.value.filter(evento => eventoSeleccionado.value.includes(evento.id));
+  try {
+    await Promise.all(
+      eventosSeleccionados.map(evento => actualizarEventoFirestore({ ...evento, eliminado: true }))
+    );
+    eventosSeleccionados.forEach(evento => evento.eliminado = true);
+    contadorNuevos.value = eventos.value.filter(evento => evento.nuevo && !evento.eliminado).length;
+    eventoSeleccionado.value = []; // Limpiar la selección después de eliminar
+  } catch (error) {
+    console.error('Error al eliminar las notificaciones seleccionadas:', error);
+  }
+};
 
 // Montar y desmontar
 onMounted(() => {
@@ -114,38 +161,106 @@ onBeforeUnmount(() => {
 </script>
 
 <style scoped>
-/* Estilos del modal de notificaciones */
+/* Estilos generales para el modal */
 .notificaciones-modal .modal-box {
-  background: linear-gradient(135deg, #ffffff, #f0f8ff);
-  border-radius: 10px;
-  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
-  width: 80%;
-  max-width: 900px;
+  background: #ffffff;
+  border-radius: 15px;
+  box-shadow: 0 15px 40px rgba(0, 0, 0, 0.1);
+  width: 50%;
+  max-width: 1000px;
+  padding: 20px;
+  animation: modalIn 0.5s ease-in-out;
 }
 
+/* Título del modal */
 .notificaciones-modal h3 {
-  color: #1e40af;
+  color: #3b82f6;
   text-align: center;
   font-size: 1.5rem;
+  font-weight: 700;
+  margin-bottom: 15px;
+  text-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+/* Lista de notificaciones */
+.notificaciones-modal ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
 }
 
 .notificaciones-modal ul li {
   display: flex;
-  gap: 10px;
-  padding: 15px;
-  border-radius: 8px;
-  background-color: #e0f2fe;
-  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px;
+  margin-bottom: 12px;
+  background-color: #eff6ff;
+  border-radius: 10px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  transition: all 0.3s ease;
+  animation: fadeIn 0.3s ease-in-out;
 }
 
+/* Efecto hover en las notificaciones */
 .notificaciones-modal ul li:hover {
-  transform: scale(1.03);
-  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-  background-color: #bae6fd;
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+  background-color: #e0f2fe;
 }
 
+/* Notificaciones vistas */
 .notificaciones-modal ul li.visto {
-  background-color: #f3f4f6;
+  background-color: #f9fafb;
   color: #6b7280;
+  border-left: 5px solid #d1d5db;
 }
+
+/* Notificaciones eliminadas */
+.notificaciones-modal ul li.eliminado {
+  background-color: #fef2f2;
+  color: #9b1d1d;
+  text-decoration: line-through;
+  border-left: 5px solid #ef4444;
+}
+
+/* Estilo para los íconos */
+.notificaciones-modal i {
+  font-size: 18px;
+  transition: transform 0.3s ease;
+}
+
+.notificaciones-modal i:hover {
+  transform: rotate(20deg);
+}
+
+/* Animación de la campana para llamar la atención */
+.notificaciones-modal .indicator {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Animación al ingresar el modal */
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.8);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+/* Animación para los elementos de la lista */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 </style>

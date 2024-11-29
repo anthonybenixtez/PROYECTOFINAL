@@ -107,14 +107,14 @@ const nuevoEvento = ref({
   titulo: '',
   imagen: '',
   descripcion: '',
-  categoria: 'ciencias de la computación',
+  categoria: 'Ciencias de la Computación',
   nuevo: true
 });
 
 // Cargar eventos al montar el componente
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias de la computación'); // Filtrar por categoría
+  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias de la Computación'); // Filtrar por categoría
 });
 
 // Agregar un nuevo evento
@@ -125,7 +125,7 @@ const agregarEvento = () => {
     titulo: '',
     imagen: '',
     descripcion: '',
-    categoria: 'ciencias de la computación', // Asegurarte de asignar la categoría
+    categoria: 'Ciencias de la Computación', // Asegurarte de asignar la categoría
     nuevo: true
   };
 };
@@ -145,7 +145,7 @@ const guardarEvento = async () => {
       await agregarEventoFirestore({ ...nuevoEvento.value });
     }
     const todosLosEventos = await obtenerEventosFirestore();
-    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias de la computación'); // Actualizar eventos filtrados
+    eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias de la Computación'); // Actualizar eventos filtrados
     showForm.value = false;
   } else {
     alert('Por favor, ingresa un título y una imagen para el evento');
@@ -156,7 +156,7 @@ const guardarEvento = async () => {
 const eliminarEvento = async (id) => {
   await eliminarEventoFirestore(id);
   const todosLosEventos = await obtenerEventosFirestore();
-  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'ciencias de la computación');
+  eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias de la Computación');
 };
 
 // Mostrar dirección en el modal

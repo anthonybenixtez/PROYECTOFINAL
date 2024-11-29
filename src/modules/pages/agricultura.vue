@@ -21,7 +21,7 @@
           </h2>
           <p class="text-gray-700 mt-2 mb-4">{{ evento.descripcion }}</p>
           <div class="card-actions justify-between mt-4 space-x-4">
-            <div class="badge badge-outline text-lg text-gray-600">Agricultura</div>
+            <div class="badge badge-outline text-lg text-gray-600">Ingeniería Agroecológica</div>
           </div>
         </div>
 
@@ -106,7 +106,7 @@ const nuevoEvento = ref({
   titulo: "",
   imagen: "",
   descripcion: "",
-  categoria: "agricultura",
+  categoria: "Ingeniería Agroecológica",
   nuevo: true
 });
 
@@ -114,7 +114,7 @@ const nuevoEvento = ref({
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
   eventos.value = todosLosEventos.filter(
-    (evento) => evento.categoria === "agricultura"
+    (evento) => evento.categoria === "Ingeniería Agroecológica"
   ); // Filtrar por categoría
 });
 
@@ -126,7 +126,7 @@ const agregarEvento = () => {
     titulo: "",
     imagen: "",
     descripcion: "",
-    categoria: "agricultura", // Asegúrate de asignar la categoría
+    categoria: "Ingeniería Agroecológica", // Asegúrate de asignar la categoría
     nuevo: true
   };
 };
@@ -147,7 +147,7 @@ const guardarEvento = async () => {
     }
     const todosLosEventos = await obtenerEventosFirestore();
     eventos.value = todosLosEventos.filter(
-      (evento) => evento.categoria === "agricultura"
+      (evento) => evento.categoria === "Ingeniería Agroecológica"
     ); // Actualizar eventos filtrados
     showForm.value = false;
   } else {
@@ -160,7 +160,7 @@ const eliminarEvento = async (id) => {
   await eliminarEventoFirestore(id);
   const todosLosEventos = await obtenerEventosFirestore();
   eventos.value = todosLosEventos.filter(
-    (evento) => evento.categoria === "agricultura"
+    (evento) => evento.categoria === "Ingeniería Agroecológica"
   );
 };
 

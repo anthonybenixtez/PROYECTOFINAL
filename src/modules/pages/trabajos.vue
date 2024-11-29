@@ -109,7 +109,7 @@ const nuevoEvento = ref({
   titulo: '',
   imagen: '',
   descripcion: '',
-  categoria: 'trabajo social',
+  categoria: 'Trabajo Social',
   nuevo: true,
 });
 
@@ -117,7 +117,7 @@ const nuevoEvento = ref({
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
   eventos.value = todosLosEventos.filter(
-    (evento) => evento.categoria === 'trabajo social'
+    (evento) => evento.categoria === 'Trabajo Social'
   ); // Filtrar por categoría
 });
 
@@ -129,7 +129,7 @@ const agregarEvento = () => {
     titulo: '',
     imagen: '',
     descripcion: '',
-    categoria: 'trabajo social', // Asignar la categoría automáticamente
+    categoria: 'Trabajo Social', // Asignar la categoría automáticamente
     nuevo: true,
   };
 };
@@ -150,7 +150,7 @@ const guardarEvento = async () => {
     }
     const todosLosEventos = await obtenerEventosFirestore();
     eventos.value = todosLosEventos.filter(
-      (evento) => evento.categoria === 'trabajo social'
+      (evento) => evento.categoria === 'Trabajo Social'
     ); // Actualizar eventos filtrados
     showForm.value = false;
   } else {
@@ -163,7 +163,7 @@ const eliminarEvento = async (id) => {
   await eliminarEventoFirestore(id);
   const todosLosEventos = await obtenerEventosFirestore();
   eventos.value = todosLosEventos.filter(
-    (evento) => evento.categoria === 'trabajo social'
+    (evento) => evento.categoria === 'Trabajo Social'
   );
 };
 

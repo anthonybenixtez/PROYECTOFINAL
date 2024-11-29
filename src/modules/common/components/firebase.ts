@@ -76,8 +76,8 @@ export const obtenerEventosPorFecha = async (fecha: string) => {
   }
 };
 
-// Función para actualizar un evento en Firestore
-async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string, categoria?: string, fecha?: string }) {
+// Función para actualizar un evento en Firestore// Función para actualizar un evento en Firestore
+async function actualizarEventoFirestore(evento: { id: string, titulo: string, imagen: string, descripcion: string, categoria?: string, fecha?: string, nuevo?: boolean }) {
   try {
     const eventoRef = doc(db, "eventos", evento.id); // Referencia al documento del evento
     const updateData: any = {
@@ -88,6 +88,7 @@ async function actualizarEventoFirestore(evento: { id: string, titulo: string, i
 
     if (evento.categoria) updateData.categoria = evento.categoria;
     if (evento.fecha) updateData.fecha = evento.fecha;
+    if (evento.nuevo !== undefined) updateData.nuevo = evento.nuevo; // Agregar o actualizar el campo 'nuevo'
 
     await updateDoc(eventoRef, updateData);
     console.log("Evento actualizado con ID: ", evento.id);
@@ -95,6 +96,7 @@ async function actualizarEventoFirestore(evento: { id: string, titulo: string, i
     console.error("Error actualizando documento: ", e);
   }
 }
+
 
 // Función para eliminar un evento en Firestore
 async function eliminarEventoFirestore(id: string) {
