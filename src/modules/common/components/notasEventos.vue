@@ -2,7 +2,7 @@
   <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div class="bg-blue-500 p-6 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg relative">
       <h3 class="text-lg font-bold mb-4 text-white">Añadir una invitación pública para el día {{ selectedDate }}</h3>
-      
+
       <!-- Sección de Nota -->
       <div class="mb-4">
         <input 
@@ -22,11 +22,10 @@
       <div class="mb-4">
         <h4 class="text-md font-semibold mb-3 text-white">Eventos del día</h4>
         <ul class="space-y-2 mb-4">
-          <li v-for="(evento, index) in eventos" :key="evento.id" class="flex flex-col bg-gray-100 p-2 rounded-lg text-sm">
+          <li v-for="(evento, index) in eventos" :key="index" class="flex flex-col bg-gray-100 p-2 rounded-lg text-sm">
             <div class="text-black">
-              <span class="font-semibold">{{ evento.nombre }}</span>
-              <p>{{ evento.descripcion }}</p>
-              <!-- Se eliminó la hora del evento -->
+              <span class="font-semibold">{{ evento.titulo }}</span> <!-- Usamos "titulo" en lugar de "nombre" -->
+              <p class="italic text-gray-600">Categoría: {{ evento.categoria }}</p> <!-- Mostramos la categoría -->
             </div>
           </li>
         </ul>
@@ -36,7 +35,7 @@
       <div>
         <h4 class="text-md font-semibold mb-3 text-white">Notas del día</h4>
         <ul class="space-y-2">
-          <li v-for="(note, index) in notes" :key="note.id" class="flex items-start justify-between bg-gray-100 p-2 rounded-lg text-sm">
+          <li v-for="(note, index) in notes" :key="index" class="flex items-start justify-between bg-gray-100 p-2 rounded-lg text-sm">
             <div class="flex-1 mr-2 overflow-hidden text-black overflow-ellipsis">
               <span v-if="editingIndex !== index" class="block whitespace-pre-wrap break-words max-h-20 overflow-y-auto">
                 {{ note.text }}
@@ -95,14 +94,14 @@ export default defineComponent({
   props: {
     showModal: Boolean,
     selectedDate: String,
-    eventos: Array,
+    eventos: Array, // Asegúrate de que cada evento tiene una propiedad `categoria`
   },
   emits: ['close'],
   setup(props, { emit }) {
     const auth = getAuth();
     const user = auth.currentUser;
     const newNote = ref('');
-    const notes = ref<{ id: string; text: string }[]>([]);
+    const notes = ref<{ text: string }[]>([]);
     const editingIndex = ref<number | null>(null);
     const editNoteText = ref('');
 
@@ -112,38 +111,36 @@ export default defineComponent({
       editingIndex.value = null;
       editNoteText.value = '';
     };
+
     const fetchNotes = () => {
-  if (props.selectedDate) {
-    const notesCollection = collection(db, 'notes');
-    const q = query(
-      notesCollection,
-      where("date", "==", props.selectedDate)
-    );
+      if (props.selectedDate) {
+        const notesCollection = collection(db, 'notes');
+        const q = query(
+          notesCollection,
+          where("date", "==", props.selectedDate)
+        );
 
-    onSnapshot(q, (querySnapshot) => {
-      notes.value = querySnapshot.docs.map(doc => ({
-        id: doc.id,
-        text: doc.data().note,
-      }));
-    });
-  }
-};
+        onSnapshot(q, (querySnapshot) => {
+          notes.value = querySnapshot.docs.map(doc => ({
+            text: doc.data().note,
+          }));
+        });
+      }
+    };
 
-
-const saveNote = async () => {
-  if (newNote.value && props.selectedDate) {
-    try {
-      await addDoc(collection(db, 'notes'), {
-        note: newNote.value,
-        date: props.selectedDate,
-      });
-      newNote.value = '';
-    } catch (error) {
-      console.error("Error al guardar la nota: ", error);
-    }
-  }
-};
-
+    const saveNote = async () => {
+      if (newNote.value && props.selectedDate) {
+        try {
+          await addDoc(collection(db, 'notes'), {
+            note: newNote.value,
+            date: props.selectedDate,
+          });
+          newNote.value = '';
+        } catch (error) {
+          console.error("Error al guardar la nota: ", error);
+        }
+      }
+    };
 
     const startEditing = (index: number) => {
       editingIndex.value = index;
@@ -151,13 +148,13 @@ const saveNote = async () => {
     };
 
     const saveEdit = async (noteId: string) => {
-  if (editNoteText.value) {
-    const noteDoc = doc(db, 'notes', noteId);
-    await updateDoc(noteDoc, { note: editNoteText.value });
-    editingIndex.value = null;
-    editNoteText.value = '';
-  }
-};
+      if (editNoteText.value) {
+        const noteDoc = doc(db, 'notes', noteId);
+        await updateDoc(noteDoc, { note: editNoteText.value });
+        editingIndex.value = null;
+        editNoteText.value = '';
+      }
+    };
 
     const cancelEdit = () => {
       editingIndex.value = null;
@@ -165,35 +162,36 @@ const saveNote = async () => {
     };
 
     const deleteNote = async (noteId: string) => {
-  const noteDoc = doc(db, 'notes', noteId);
-  await deleteDoc(noteDoc);
-};
+      const noteDoc = doc(db, 'notes', noteId);
+      await deleteDoc(noteDoc);
+    };
 
     const saveEvent = async (evento) => {
       if (props.selectedDate && user) {
         try {
           // Guardamos el evento en Firebase
           await addDoc(collection(db, 'events'), {
-            nombre: evento.nombre,
+            titulo: evento.titulo, // Cambié "nombre" por "titulo"
             descripcion: evento.descripcion,
+            categoria: evento.categoria, // Guardamos la categoría
             fecha: props.selectedDate, 
             userId: user.uid,
           });
-          // Actualizamos el icono de notificación solo cuando se agrega un evento
-          updateNotificationIcon();
+
+          // Actualizar el icono de notificación solo cuando se agrega un evento
+          updateNotificationIcon(evento);
         } catch (error) {
           console.error("Error al guardar el evento: ", error);
         }
       }
     };
 
-    const updateNotificationIcon = () => {
-      // Solo actualizamos el icono de notificación cuando se agrega un evento
+    const updateNotificationIcon = (evento) => {
       const eventDate = props.selectedDate;
-      const eventIndex = props.eventos.findIndex(event => event.fecha === eventDate);
+      const eventIndex = props.eventos.findIndex(event => event.fecha === eventDate && event.titulo === evento.titulo); // Cambié "nombre" por "titulo"
       if (eventIndex >= 0) {
-        // Aquí puedes cambiar el estado de un ícono para indicar que hay eventos en ese día
-        console.log("¡Notificación activada para el evento!");
+        // Aquí se activa la lógica de la notificación
+        console.log("¡Notificación activada para el evento!", evento);
       }
     };
 

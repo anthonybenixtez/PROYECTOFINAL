@@ -1,37 +1,49 @@
 <template>
-  <div class="flex flex-col items-center justify-center min-h-screen bg-gray-100">
-    <div class="bg-white p-6 rounded-lg shadow-lg w-80 border border-gray-300">
-      <h2 class="text-2xl font-bold text-center mb-4 text-gray-800">
+  <div class="flex items-center justify-center min-h-screen bg-gradient-to-r from-blue-500 to-teal-400">
+    <div class="bg-white p-8 rounded-2xl shadow-xl w-full sm:w-96 max-w-lg">
+      <h2 class="text-3xl font-extrabold text-center mb-6 text-gray-800">
         Iniciar Sesión
       </h2>
-      <form @submit.prevent="handleSubmit">
+      <form @submit.prevent="handleSubmit" class="space-y-6">
         <!-- Campo de correo electrónico -->
-        <input
-          type="email"
-          v-model="email"
-          placeholder="Correo Electrónico"
-          required
-          class="border border-gray-300 p-2 mb-4 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-        />
-        
-        <!-- Campo de contraseña -->
-        <input
-          type="password"
-          v-model="password"
-          placeholder="Contraseña"
-          required
-          class="border border-gray-300 p-2 mb-4 w-full rounded-md focus:outline-none focus:ring focus:ring-blue-500"
-        />
-        
-        <!-- Botón de enviar -->
-        <button
-          type="submit"
-          class="bg-blue-500 text-white p-2 rounded-md hover:bg-blue-600 transition duration-200 w-full"
-        >
-          Iniciar Sesión
-        </button>
-      </form>
+        <div>
+          <input
+            type="email"
+            v-model="email"
+            placeholder="Correo Electrónico"
+            required
+            class="input input-bordered w-full rounded-md focus:ring focus:ring-blue-300"
+          />
+        </div>
 
+        <!-- Campo de contraseña -->
+        <div>
+          <input
+            type="password"
+            v-model="password"
+            placeholder="Contraseña"
+            required
+            class="input input-bordered w-full rounded-md focus:ring focus:ring-blue-300"
+          />
+        </div>
+
+        <!-- Botón de enviar -->
+        <div>
+          <button
+            type="submit"
+            class="btn btn-primary w-full py-3 rounded-md hover:bg-blue-600 transition duration-300"
+          >
+            Iniciar Sesión
+          </button>
+        </div>
+
+        <!-- Enlace para recuperar la contraseña -->
+        <div class="text-center">
+          <a href="#" class="text-sm text-blue-500 hover:text-blue-700">
+            ¿Olvidaste tu contraseña?
+          </a>
+        </div>
+      </form>
     </div>
   </div>
 </template>

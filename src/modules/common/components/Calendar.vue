@@ -28,20 +28,10 @@
         }"
       >
         {{ date }}
-        <!-- Notificaciones para notas -->
-        <span
-          v-if="noteCounts[date]"
-          class="absolute top-0 right-4 bg-red-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-        >
-          {{ noteCounts[date] }}
-        </span>
-        <!-- Notificaciones para eventos -->
-        <span
-          v-if="eventCounts[date]"
-          class="absolute top-0 right-0 bg-yellow-500 text-white text-xs rounded-full w-5 h-5 flex items-center justify-center"
-        >
-          {{ eventCounts[date] }}
-        </span>
+        <!-- Globito de notificación si hay eventos -->
+        <div v-if="eventosDelDia[date]" class="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
+          {{ eventosDelDia[date] }}
+        </div>
       </div>
     </div>
 
@@ -50,19 +40,17 @@
       v-if="showModal"
       :show-modal="showModal"
       :selected-date="formattedSelectedDate"
-      :eventos="eventosDelDia"
+      :eventos="eventosModal"
       @close="closeModal"
     />
   </div>
 </template>
 
-
 <script lang="ts">
-import { defineComponent, ref, computed, onMounted } from 'vue';
+import { defineComponent } from 'vue';
 import NotasEventos from '@/modules/common/components/notasEventos.vue';
+import { collection, query, where, getDocs } from 'firebase/firestore';
 import { db } from '@/modules/common/components/firebase';
-import { collection, onSnapshot, query, where, getDocs } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
 
 export default defineComponent({
   components: { NotasEventos },
@@ -73,9 +61,8 @@ export default defineComponent({
       currentMonth: new Date().getMonth(),
       currentYear: new Date().getFullYear(),
       showModal: false,
-      noteCounts: {} as { [key: number]: number }, // Contador de notas por fecha
-      eventCounts: {} as { [key: number]: number }, // Contador de eventos por fecha
-      eventosDelDia: [], // Array para guardar eventos del día
+      eventosDelDia: {}, // Cantidad de eventos por día para los globos
+      eventosModal: [], // Eventos específicos para el modal
     };
   },
   computed: {
@@ -102,43 +89,47 @@ export default defineComponent({
     openModal(date: number) {
       this.selectedDate = date;
       this.showModal = true;
-
-      // Formatear la fecha seleccionada para buscar los eventos
       const formattedDate = `${date}/${this.currentMonth + 1}/${this.currentYear}`;
-      
-      // Obtener eventos de la fecha seleccionada
-      this.obtenerEventosPorFecha(formattedDate);
+      this.obtenerEventosPorFecha(formattedDate); // Llenar eventosModal
     },
+    async fetchEventosCount() {
+      const eventosRef = collection(db, "eventos");
+      const querySnapshot = await getDocs(eventosRef);
+      const eventos = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
 
+      // Crear un objeto con la cantidad de eventos por día
+      const count: { [key: number]: number } = {};
+      eventos.forEach(evento => {
+        const [day, month, year] = evento.fecha.split('/').map(Number);
+        if (month - 1 === this.currentMonth && year === this.currentYear) {
+          count[day] = count[day] ? count[day] + 1 : 1;
+        }
+      });
+      this.eventosDelDia = count; // Actualizar datos para los globos
+    },
     async obtenerEventosPorFecha(fecha: string) {
       const eventos = await this.fetchEventosPorFecha(fecha);
-      this.eventosDelDia = eventos;
+      this.eventosModal = eventos; // Llenar eventos para el modal
     },
-
     async fetchEventosPorFecha(fecha: string) {
       const eventosRef = collection(db, "eventos");
       const q = query(eventosRef, where("fecha", "==", fecha));
       const querySnapshot = await getDocs(q);
-      const eventos = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
-      return eventos;
+      return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
     },
-
     closeModal() {
       this.showModal = false;
       this.selectedDate = null;
-      this.eventosDelDia = []; // Limpiar eventos al cerrar modal
+      this.eventosModal = []; // Limpiar solo los eventos del modal
     },
-
     isSelected(date: number) {
       return this.selectedDate === date;
     },
-
     isToday(date: number) {
-      return date === this.today.getDate() && 
-             this.currentMonth === new Date().getMonth() && 
-             this.currentYear === new Date().getFullYear();
+      return date === this.today.getDate() &&
+             this.currentMonth === this.today.getMonth() &&
+             this.currentYear === this.today.getFullYear();
     },
-
     prevMonth() {
       if (this.currentMonth === 0) {
         this.currentMonth = 11;
@@ -146,9 +137,8 @@ export default defineComponent({
       } else {
         this.currentMonth--;
       }
-      this.fetchNoteCounts();
+      this.fetchEventosCount(); // Actualizar eventos del nuevo mes
     },
-
     nextMonth() {
       if (this.currentMonth === 11) {
         this.currentMonth = 0;
@@ -156,52 +146,14 @@ export default defineComponent({
       } else {
         this.currentMonth++;
       }
-      this.fetchNoteCounts();
-    },
-
-    async fetchNoteCounts() {
-      const auth = getAuth();
-      const user = auth.currentUser;
-      this.noteCounts = {}; // Reiniciar contador de notas
-      this.eventCounts = {}; // Reiniciar contador de eventos
-
-      if (user) {
-        const notesCollection = collection(db, 'notes');
-        const eventsCollection = collection(db, 'eventos');
-        const userQuery = where("userId", "==", user.uid);
-
-        // Escucha cambios en tiempo real para notas
-        onSnapshot(query(notesCollection, userQuery), (querySnapshot) => {
-          this.noteCounts = {};
-          querySnapshot.docs.forEach((doc) => {
-            const noteData = doc.data();
-            const [noteDay, noteMonth, noteYear] = noteData.date.split('/').map(Number);
-            if (noteYear === this.currentYear && noteMonth - 1 === this.currentMonth) {
-              this.noteCounts[noteDay] = (this.noteCounts[noteDay] || 0) + 1;
-            }
-          });
-        });
-
-        // Escucha cambios en tiempo real para eventos
-        onSnapshot(query(eventsCollection, userQuery), (querySnapshot) => {
-          this.eventCounts = {};
-          querySnapshot.docs.forEach((doc) => {
-            const eventData = doc.data();
-            const [eventDay, eventMonth, eventYear] = eventData.fecha.split('/').map(Number);
-            if (eventYear === this.currentYear && eventMonth - 1 === this.currentMonth) {
-              this.eventCounts[eventDay] = (this.eventCounts[eventDay] || 0) + 1;
-            }
-          });
-        });
-      }
+      this.fetchEventosCount(); // Actualizar eventos del nuevo mes
     },
   },
   mounted() {
-    this.fetchNoteCounts();
+    this.fetchEventosCount(); // Inicializar los globos al cargar la página
   },
 });
 </script>
-
 
 <style scoped>
 .max-w-md {
