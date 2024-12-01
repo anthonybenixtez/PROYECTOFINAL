@@ -1,15 +1,28 @@
 <template>
+  <div class="w-full bg-white shadow-md py-4">
+    <!-- Barra de búsqueda -->
+    <div class="container mx-auto px-4 flex justify-center">
+      <input
+        type="text"
+        v-model="busqueda"
+        class="input input-bordered w-full max-w-lg"
+        placeholder="Buscar evento..."
+      />
+    </div>
+  </div>
+
   <div class="flex justify-center items-center min-h-screen bg-gray-100 relative">
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <!-- Contenedor de tarjetas de eventos con separación y máximo de 4 tarjetas por fila -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 xl:grid-cols-3 px-4">
       <!-- Mostrar eventos existentes -->
       <div
-        v-for="(evento, index) in eventos"
+        v-for="(evento, index) in eventosFiltrados"
         :key="index"
-        class="card bg-base-200 w-96 shadow-xl rounded-2xl overflow-hidden relative pb-16"
+        class="card bg-base-200 w-full shadow-xl rounded-2xl overflow-hidden relative pb-16"
       >
         <figure>
           <img
-            class="w-full h-56 object-cover"
+            class="w-full h-56 object-cover rounded-t-2xl"
             :src="evento.imagen"
             :alt="evento.titulo"
           />
@@ -27,7 +40,7 @@
 
         <!-- Botón Dirección (izquierda) -->
         <button
-          class="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 absolute bottom-4 left-4 flex items-center justify-center space-x-2"
+          class="btn bg-blue-500 hover:bg-blue-600 text-white rounded-full p-3 absolute bottom-4 left-4"
           @click="verDireccion(evento)"
         >
           <i class="fas fa-map-marker-alt"></i>
@@ -35,8 +48,8 @@
 
         <!-- Botón Editar (derecha) -->
         <button
-        v-if="isLoggedIn"
-          class="btn bg-gray-500 hover:bg-gray-600 text-white rounded-full p-3 absolute bottom-4 right-4 flex items-center justify-center space-x-2"
+          v-if="isLoggedIn"
+          class="btn bg-gray-500 hover:bg-gray-600 text-white rounded-full p-3 absolute bottom-4 right-4"
           @click="editarEvento(evento)"
         >
           <i class="fas fa-edit"></i>
@@ -84,14 +97,11 @@
 </template>
 
 <script setup>
-
-
 import { useAuthState } from "../common/components/authState.ts";
 // Estado de autenticación
 const { isLoggedIn } = useAuthState();
 
-
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import {
   obtenerEventosFirestore,
   agregarEventoFirestore,
@@ -104,6 +114,7 @@ import FormularioEvento from '../common/components/FormularioEvento.vue';
 const myModal = ref(false);
 const showForm = ref(false);
 const eventos = ref([]);
+const busqueda = ref(''); // Variable reactiva para el texto de búsqueda
 const nuevoEvento = ref({
   id: '',
   titulo: '',
@@ -119,6 +130,13 @@ onMounted(async () => {
   eventos.value = todosLosEventos.filter(
     (evento) => evento.categoria === 'Trabajo Social'
   ); // Filtrar por categoría
+});
+
+// Computed property para filtrar eventos según la búsqueda
+const eventosFiltrados = computed(() => {
+  return eventos.value.filter(evento =>
+    evento.titulo.toLowerCase().includes(busqueda.value.toLowerCase())
+  );
 });
 
 // Agregar un nuevo evento
@@ -178,3 +196,40 @@ const cancelarEdicion = () => {
   showForm.value = false;
 };
 </script>
+
+<style scoped>
+/* Estilos para las tarjetas */
+.grid {
+  gap: 1.5rem; /* Espacio entre las tarjetas */
+}
+
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: 100% !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .card {
+    width: 22rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .input {
+    padding: 1rem;
+  }
+
+  .modal-box {
+    padding: 1rem;
+  }
+}
+</style>

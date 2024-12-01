@@ -1,9 +1,22 @@
 <template>
+  <div class="w-full bg-white shadow-md py-4">
+    <div class="container mx-auto px-4 flex justify-center">
+      <input
+        type="text"
+        v-model="busqueda"
+        class="input input-bordered w-full max-w-lg"
+        placeholder="Buscar evento..."
+      />
+    </div>
+  </div>
   <div class="flex justify-center items-center min-h-screen bg-gray-100 relative">
+    <!-- Campo de búsqueda -->
+
+
     <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
       <!-- Mostrar eventos existentes -->
       <div
-        v-for="(evento, index) in eventos"
+        v-for="(evento, index) in eventosFiltrados"
         :key="index"
         class="card bg-base-200 w-96 shadow-xl rounded-2xl overflow-hidden relative pb-16"
       >
@@ -84,7 +97,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from "vue";
+import { ref, onMounted, computed } from "vue";
 import {
   obtenerEventosFirestore,
   agregarEventoFirestore,
@@ -101,6 +114,7 @@ const { isLoggedIn } = useAuthState();
 const myModal = ref(false);
 const showForm = ref(false);
 const eventos = ref([]);
+const busqueda = ref("");
 const nuevoEvento = ref({
   id: "",
   titulo: "",
@@ -116,6 +130,16 @@ onMounted(async () => {
   eventos.value = todosLosEventos.filter(
     (evento) => evento.categoria === "Ingeniería Agroecológica"
   ); // Filtrar por categoría
+});
+
+// Filtrar los eventos con base en la búsqueda
+const eventosFiltrados = computed(() => {
+  return eventos.value.filter((evento) => {
+    return (
+      evento.titulo.toLowerCase().includes(busqueda.value.toLowerCase()) ||
+      evento.descripcion.toLowerCase().includes(busqueda.value.toLowerCase())
+    );
+  });
 });
 
 // Agregar un nuevo evento
@@ -175,3 +199,7 @@ const cancelarEdicion = () => {
   showForm.value = false;
 };
 </script>
+
+<style scoped>
+/* Puedes agregar estilos adicionales si lo necesitas */
+</style>

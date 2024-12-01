@@ -1,9 +1,22 @@
 <template>
+  <div class="w-full bg-white shadow-md py-4">
+    <!-- Barra de búsqueda -->
+    <div class="container mx-auto px-4 flex justify-center items-center">
+      <input
+        type="text"
+        v-model="searchText"
+        class="input input-bordered w-full max-w-lg"
+        placeholder="Buscar evento por nombre..."
+      />
+    </div>
+  </div>
+
   <div class="flex justify-center items-center min-h-screen bg-gray-100 relative">
-    <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+    <!-- Contenedor de tarjetas de eventos con separación y un máximo de 4 tarjetas por fila -->
+    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-4 px-4">
       <!-- Mostrar eventos existentes -->
       <div
-        v-for="(evento, index) in eventos"
+        v-for="(evento, index) in filteredEventos"
         :key="index"
         class="card bg-base-200 w-96 shadow-xl rounded-2xl overflow-hidden relative pb-16"
       >
@@ -89,8 +102,7 @@ import { useAuthState } from "../common/components/authState.ts";
 // Estado de autenticación
 const { isLoggedIn } = useAuthState();
 
-
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import {
   obtenerEventosFirestore,
   agregarEventoFirestore,
@@ -112,11 +124,21 @@ const nuevoEvento = ref({
   nuevo: true
 });
 
+// Estado para la búsqueda
+const searchText = ref("");
+
 // Cargar eventos al montar el componente
 onMounted(async () => {
   const todosLosEventos = await obtenerEventosFirestore();
   eventos.value = todosLosEventos.filter((evento) => evento.categoria === 'Ciencias Jurídicas'); // Filtrar por categoría
 });
+
+// Computed para filtrar eventos
+const filteredEventos = computed(() =>
+  eventos.value.filter((evento) =>
+    evento.titulo.toLowerCase().includes(searchText.value.toLowerCase())
+  )
+);
 
 // Agregar un nuevo evento
 const agregarEvento = () => {
@@ -171,3 +193,40 @@ const cancelarEdicion = () => {
   showForm.value = false;
 };
 </script>
+
+<style scoped>
+/* Asegurarse de que las tarjetas tengan espacio entre ellas y padding a los lados */
+.grid {
+  gap: 1.5rem; /* Espacio entre las tarjetas */
+}
+
+.card {
+  transition: transform 0.2s ease-in-out;
+}
+
+.card:hover {
+  transform: scale(1.05);
+}
+
+@media (max-width: 768px) {
+  .card {
+    width: 100% !important;
+  }
+}
+
+@media (min-width: 768px) {
+  .card {
+    width: 22rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .input {
+    padding: 1rem;
+  }
+
+  .modal-box {
+    padding: 1rem;
+  }
+}
+</style>
