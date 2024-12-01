@@ -29,8 +29,11 @@
       >
         {{ date }}
         <!-- Globito de notificación si hay eventos -->
-        <div v-if="eventosDelDia[date]" class="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center">
-          {{ eventosDelDia[date] }}
+        <div
+          v-if="eventosDelDia[`${date}/${currentMonth + 1}/${currentYear}`]"
+          class="absolute top-1 right-1 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center"
+        >
+          {{ eventosDelDia[`${date}/${currentMonth + 1}/${currentYear}`] }}
         </div>
       </div>
     </div>
@@ -87,48 +90,50 @@ export default defineComponent({
   },
   methods: {
     openModal(date: number) {
-      this.selectedDate = date;
+      this.selectedDate = `${date}/${this.currentMonth + 1}/${this.currentYear}`;
       this.showModal = true;
-      const formattedDate = `${date}/${this.currentMonth + 1}/${this.currentYear}`;
-      this.obtenerEventosPorFecha(formattedDate); // Llenar eventosModal
+      this.obtenerEventosPorFecha(this.selectedDate);
     },
-    async fetchEventosCount() {
-      const eventosRef = collection(db, "eventos");
+    async actualizarEventos() {
+      const eventosRef = collection(db, 'eventos');
       const querySnapshot = await getDocs(eventosRef);
-      const eventos = querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      const eventos = querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
 
-      // Crear un objeto con la cantidad de eventos por día
-      const count: { [key: number]: number } = {};
-      eventos.forEach(evento => {
+      const count: { [key: string]: number } = {};
+      eventos.forEach((evento) => {
         const [day, month, year] = evento.fecha.split('/').map(Number);
-        if (month - 1 === this.currentMonth && year === this.currentYear) {
-          count[day] = count[day] ? count[day] + 1 : 1;
+        if (month === this.currentMonth + 1 && year === this.currentYear) {
+          const key = `${day}/${month}/${year}`;
+          count[key] = count[key] ? count[key] + 1 : 1;
         }
       });
-      this.eventosDelDia = count; // Actualizar datos para los globos
+
+      this.eventosDelDia = count;
     },
     async obtenerEventosPorFecha(fecha: string) {
       const eventos = await this.fetchEventosPorFecha(fecha);
-      this.eventosModal = eventos; // Llenar eventos para el modal
+      this.eventosModal = eventos;
     },
     async fetchEventosPorFecha(fecha: string) {
-      const eventosRef = collection(db, "eventos");
-      const q = query(eventosRef, where("fecha", "==", fecha));
+      const eventosRef = collection(db, 'eventos');
+      const q = query(eventosRef, where('fecha', '==', fecha));
       const querySnapshot = await getDocs(q);
-      return querySnapshot.docs.map(doc => ({ ...doc.data(), id: doc.id }));
+      return querySnapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id }));
     },
     closeModal() {
       this.showModal = false;
       this.selectedDate = null;
-      this.eventosModal = []; // Limpiar solo los eventos del modal
+      this.eventosModal = [];
     },
     isSelected(date: number) {
-      return this.selectedDate === date;
+      return this.selectedDate === `${date}/${this.currentMonth + 1}/${this.currentYear}`;
     },
     isToday(date: number) {
-      return date === this.today.getDate() &&
-             this.currentMonth === this.today.getMonth() &&
-             this.currentYear === this.today.getFullYear();
+      return (
+        date === this.today.getDate() &&
+        this.currentMonth === this.today.getMonth() &&
+        this.currentYear === this.today.getFullYear()
+      );
     },
     prevMonth() {
       if (this.currentMonth === 0) {
@@ -137,7 +142,7 @@ export default defineComponent({
       } else {
         this.currentMonth--;
       }
-      this.fetchEventosCount(); // Actualizar eventos del nuevo mes
+      this.actualizarEventos(); // Cargar eventos para el mes anterior
     },
     nextMonth() {
       if (this.currentMonth === 11) {
@@ -146,23 +151,11 @@ export default defineComponent({
       } else {
         this.currentMonth++;
       }
-      this.fetchEventosCount(); // Actualizar eventos del nuevo mes
+      this.actualizarEventos(); // Cargar eventos para el mes siguiente
     },
   },
   mounted() {
-    this.fetchEventosCount(); // Inicializar los globos al cargar la página
+    this.actualizarEventos(); // Cargar eventos al montar el componente
   },
 });
 </script>
-
-<style scoped>
-.max-w-md {
-  max-width: 300px;
-}
-.max-h-[85vh] {
-  max-height: 85vh;
-}
-.overflow-y-auto {
-  overflow-y: auto;
-}
-</style>

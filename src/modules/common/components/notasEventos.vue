@@ -1,7 +1,7 @@
 <template>
   <div v-if="showModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
     <div class="bg-blue-500 p-6 rounded-lg w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-lg relative">
-      <h3 class="text-lg font-bold mb-4 text-white">Añadir una invitación pública para el día {{ selectedDate }}</h3>
+      <h3 class="text-lg font-bold mb-4 text-white">Invitaciones y notas del día {{ selectedDate }}</h3>
 
       <!-- Sección de Nota -->
       <div class="mb-4">
@@ -24,8 +24,9 @@
         <ul class="space-y-2 mb-4">
           <li v-for="(evento, index) in eventos" :key="index" class="flex flex-col bg-gray-100 p-2 rounded-lg text-sm">
             <div class="text-black">
-              <span class="font-semibold">{{ evento.titulo }}</span> <!-- Usamos "titulo" en lugar de "nombre" -->
-              <p class="italic text-gray-600">Categoría: {{ evento.categoria }}</p> <!-- Mostramos la categoría -->
+              <span class="font-semibold">{{ evento.titulo }}</span>
+              <p class="italic text-gray-600">Categoría: {{ evento.categoria }}</p>
+              <p class="text-gray-800">{{ evento.descripcion }}</p>
             </div>
           </li>
         </ul>
@@ -85,23 +86,20 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onMounted, watch } from 'vue';
+import { defineComponent, ref, watch, onMounted } from 'vue';
 import { db } from '@/modules/common/components/firebase';
-import { collection, addDoc, updateDoc, deleteDoc, query, where, doc, onSnapshot } from 'firebase/firestore';
-import { getAuth } from 'firebase/auth';
+import { collection, addDoc, updateDoc, deleteDoc, query, where, onSnapshot } from 'firebase/firestore';
 
 export default defineComponent({
   props: {
     showModal: Boolean,
     selectedDate: String,
-    eventos: Array, // Asegúrate de que cada evento tiene una propiedad `categoria`
+    eventos: Array,
   },
   emits: ['close'],
   setup(props, { emit }) {
-    const auth = getAuth();
-    const user = auth.currentUser;
     const newNote = ref('');
-    const notes = ref<{ text: string }[]>([]);
+    const notes = ref<{ text: string; id: string }[]>([]);
     const editingIndex = ref<number | null>(null);
     const editNoteText = ref('');
 
@@ -115,13 +113,11 @@ export default defineComponent({
     const fetchNotes = () => {
       if (props.selectedDate) {
         const notesCollection = collection(db, 'notes');
-        const q = query(
-          notesCollection,
-          where("date", "==", props.selectedDate)
-        );
+        const q = query(notesCollection, where('date', '==', props.selectedDate));
 
         onSnapshot(q, (querySnapshot) => {
-          notes.value = querySnapshot.docs.map(doc => ({
+          notes.value = querySnapshot.docs.map((doc) => ({
+            id: doc.id,
             text: doc.data().note,
           }));
         });
@@ -137,7 +133,7 @@ export default defineComponent({
           });
           newNote.value = '';
         } catch (error) {
-          console.error("Error al guardar la nota: ", error);
+          console.error('Error al guardar la nota: ', error);
         }
       }
     };
@@ -166,35 +162,6 @@ export default defineComponent({
       await deleteDoc(noteDoc);
     };
 
-    const saveEvent = async (evento) => {
-      if (props.selectedDate && user) {
-        try {
-          // Guardamos el evento en Firebase
-          await addDoc(collection(db, 'events'), {
-            titulo: evento.titulo, // Cambié "nombre" por "titulo"
-            descripcion: evento.descripcion,
-            categoria: evento.categoria, // Guardamos la categoría
-            fecha: props.selectedDate, 
-            userId: user.uid,
-          });
-
-          // Actualizar el icono de notificación solo cuando se agrega un evento
-          updateNotificationIcon(evento);
-        } catch (error) {
-          console.error("Error al guardar el evento: ", error);
-        }
-      }
-    };
-
-    const updateNotificationIcon = (evento) => {
-      const eventDate = props.selectedDate;
-      const eventIndex = props.eventos.findIndex(event => event.fecha === eventDate && event.titulo === evento.titulo); // Cambié "nombre" por "titulo"
-      if (eventIndex >= 0) {
-        // Aquí se activa la lógica de la notificación
-        console.log("¡Notificación activada para el evento!", evento);
-      }
-    };
-
     watch(() => props.selectedDate, fetchNotes);
 
     onMounted(fetchNotes);
@@ -204,7 +171,6 @@ export default defineComponent({
       notes,
       closeModal,
       saveNote,
-      saveEvent,
       editingIndex,
       editNoteText,
       startEditing,
@@ -218,15 +184,9 @@ export default defineComponent({
 
 <style scoped>
 .max-w-lg {
-  max-width: 500px; /* Aumentar el tamaño del modal */
-}
-.max-h-[90vh] {
-  max-height: 90vh; /* Hacer el modal más grande */
+  max-width: 500px;
 }
 .bg-blue-500 {
-  background-color: #3b82f6; /* Cambiar el color de fondo del modal */
-}
-.overflow-y-auto {
-  overflow-y: auto;
+  background-color: #3b82f6;
 }
 </style>
